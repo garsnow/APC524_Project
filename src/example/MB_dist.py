@@ -1,4 +1,5 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
+def particle_simulator(number_of_particles,time_step,particle_mass):
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -61,7 +62,7 @@ class MDSimulation:
 
 
 # Number of particles.
-n = 1000
+n = number_of_particles
 # Scaling factor for distance, m-1. The box dimension is therefore 1/rscale.
 rscale = 5.0e6
 # Use the van der Waals radius of Ar, about 0.2 nm.
@@ -71,10 +72,10 @@ tscale = 1e9  # i.e. time will be measured in nanoseconds.
 # Take the mean speed to be the root-mean-square velocity of Ar at 300 K.
 sbar = 353 * rscale / tscale
 # Time step in scaled time units.
-FPS = 30
+FPS = time_step
 dt = 1 / FPS
 # Particle masses, scaled by some factor we're not using yet.
-m = 1
+m = particle_mass
 
 # Initialize the particles' positions randomly.
 pos = np.random.random((n, 2))
@@ -141,8 +142,8 @@ class Histogram:
         codes[4::5] = path.Path.CLOSEPOLY
         barpath = path.Path(self.verts, codes)
         self.patch = patches.PathPatch(
-            barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
-        )
+                barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
+                )
         ax.add_patch(self.patch)
 
     def update(self, data):
@@ -196,8 +197,8 @@ mb_est = np.zeros(len(sgrid))
 # A text label indicating the time and step number for each animation frame.
 xlabel, ylabel = sgrid[-1] / 2, 0.8 * fmax
 label = speed_ax.text(
-    xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
-)
+        xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
+        )
 
 
 def init_anim():
@@ -235,7 +236,7 @@ IAV_START = 1000
 # Number of frames; set to None to run until explicitly quit.
 frames = 1000
 anim = FuncAnimation(
-    fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
-)
+        fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
+        )
 anim.save("MB_simulation.gif", writer="Pillow")
 plt.show()
