@@ -100,7 +100,7 @@ for spine in sim_ax.spines.values():
 
 speed_ax = fig.add_subplot(122)
 speed_ax.set_xlabel("v [m/s]")
-speed_ax.set_ylabel("$pdf(v)$")
+speed_ax.set_ylabel("pdf(v)")
 
 (particles,) = sim_ax.plot([], [], "ko")
 
@@ -237,5 +237,5 @@ frames = 1000
 anim = FuncAnimation(
     fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
 )
-anim.save("a.gif", writer="Pillow")
+anim.save("MB_simulation.gif", writer="Pillow")
 plt.show()
