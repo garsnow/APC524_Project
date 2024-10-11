@@ -99,8 +99,8 @@ for spine in sim_ax.spines.values():
     spine.set_linewidth(2)
 
 speed_ax = fig.add_subplot(122)
-speed_ax.set_xlabel("Speed $v\,/m\,s^{-1}$")
-speed_ax.set_ylabel("$f(v)$")
+speed_ax.set_xlabel("v [m/s]")
+speed_ax.set_ylabel("$pdf(v)$")
 
 (particles,) = sim_ax.plot([], [], "ko")
 
