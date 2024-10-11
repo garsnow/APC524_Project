@@ -77,11 +77,11 @@ dt = 1 / FPS
 m = 1
 
 # Initialize the particles' positions randomly.
-pos = np.random.Generator((n, 2))
+pos = np.random.random((n, 2))
 # Initialize the particles velocities with random orientations and random
 # magnitudes  around the mean speed, sbar.
-theta = np.random.Generator(n) * 2 * np.pi
-s0 = sbar * np.random.Generator(n)
+theta = np.random.random(n) * 2 * np.pi
+s0 = sbar * np.random.random(n)
 vel = (s0 * np.array((np.cos(theta), np.sin(theta)))).T
 
 sim = MDSimulation(pos, vel, r, m)
