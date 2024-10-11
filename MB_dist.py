@@ -1,13 +1,14 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 
-import numpy as np
-from scipy.spatial.distance import pdist, squareform
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.path as path
+import numpy as np
+from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
+from scipy.spatial.distance import pdist, squareform
 
 X, Y = 0, 1
+
+
 class MDSimulation:
 
     def __init__(self, pos, vel, r, m):
@@ -38,16 +39,16 @@ class MDSimulation:
         iarr, jarr = iarr[k], jarr[k]
 
         # For each collision, update the velocities of the particles involved.
-        for i, j in zip(iarr, jarr):
+        for i, j in zip(iarr, jarr, strict=False):
             pos_i, vel_i = self.pos[i], self.vel[i]
-            pos_j, vel_j =  self.pos[j], self.vel[j]
+            pos_j, vel_j = self.pos[j], self.vel[j]
             rel_pos, rel_vel = pos_i - pos_j, vel_i - vel_j
             r_rel = rel_pos @ rel_pos
             v_rel = rel_vel @ rel_pos
             v_rel = 2 * rel_pos * v_rel / r_rel - rel_vel
             v_cm = (vel_i + vel_j) / 2
-            self.vel[i] = v_cm - v_rel/2
-            self.vel[j] = v_cm + v_rel/2
+            self.vel[i] = v_cm - v_rel / 2
+            self.vel[j] = v_cm + v_rel / 2
 
         # Bounce the particles off the walls where necessary, by reflecting
         # their velocity vectors.
@@ -58,28 +59,29 @@ class MDSimulation:
         self.vel[hit_left_wall | hit_right_wall, X] *= -1
         self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
 
+
 # Number of particles.
 n = 1000
 # Scaling factor for distance, m-1. The box dimension is therefore 1/rscale.
-rscale = 5.e6
+rscale = 5.0e6
 # Use the van der Waals radius of Ar, about 0.2 nm.
 r = 2e-10 * rscale
 # Scale time by this factor, in s-1.
-tscale = 1e9    # i.e. time will be measured in nanoseconds.
+tscale = 1e9  # i.e. time will be measured in nanoseconds.
 # Take the mean speed to be the root-mean-square velocity of Ar at 300 K.
 sbar = 353 * rscale / tscale
 # Time step in scaled time units.
 FPS = 30
-dt = 1/FPS
+dt = 1 / FPS
 # Particle masses, scaled by some factor we're not using yet.
 m = 1
 
 # Initialize the particles' positions randomly.
-pos = np.random.random((n, 2))
+pos = np.random.Generator((n, 2))
 # Initialize the particles velocities with random orientations and random
 # magnitudes  around the mean speed, sbar.
-theta = np.random.random(n) * 2 * np.pi
-s0 = sbar * np.random.random(n)
+theta = np.random.Generator(n) * 2 * np.pi
+s0 = sbar * np.random.Generator(n)
 vel = (s0 * np.array((np.cos(theta), np.sin(theta)))).T
 
 sim = MDSimulation(pos, vel, r, m)
@@ -87,9 +89,9 @@ sim = MDSimulation(pos, vel, r, m)
 # Set up the Figure and make some adjustments to improve its appearance.
 DPI = 100
 width, height = 1000, 500
-fig = plt.figure(figsize=(width/DPI, height/DPI), dpi=DPI)
+fig = plt.figure(figsize=(width / DPI, height / DPI), dpi=DPI)
 fig.subplots_adjust(left=0, right=0.97)
-sim_ax = fig.add_subplot(121, aspect='equal', autoscale_on=False)
+sim_ax = fig.add_subplot(121, aspect="equal", autoscale_on=False)
 sim_ax.set_xticks([])
 sim_ax.set_yticks([])
 # Make the box walls a bit more substantial.
@@ -97,10 +99,11 @@ for spine in sim_ax.spines.values():
     spine.set_linewidth(2)
 
 speed_ax = fig.add_subplot(122)
-speed_ax.set_xlabel('Speed $v\,/m\,s^{-1}$')
-speed_ax.set_ylabel('$f(v)$')
+speed_ax.set_xlabel("Speed $v\,/m\,s^{-1}$")
+speed_ax.set_ylabel("$f(v)$")
 
-particles, = sim_ax.plot([], [], 'ko')
+(particles,) = sim_ax.plot([], [], "ko")
+
 
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
@@ -137,8 +140,9 @@ class Histogram:
         codes[0::5] = path.Path.MOVETO
         codes[4::5] = path.Path.CLOSEPOLY
         barpath = path.Path(self.verts, codes)
-        self.patch = patches.PathPatch(barpath, fc='tab:green', ec='k',
-                                  lw=0.5, alpha=0.5)
+        self.patch = patches.PathPatch(
+            barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
+        )
         ax.add_patch(self.patch)
 
     def update(self, data):
@@ -153,9 +157,11 @@ def get_speeds(vel):
     """Return the magnitude of the (n,2) array of velocities, vel."""
     return np.hypot(vel[:, X], vel[:, Y])
 
+
 def get_KE(speeds):
     """Return the total kinetic energy of all particles in scaled units."""
     return 0.5 * sim.m * sum(speeds**2)
+
 
 speeds = get_speeds(sim.vel)
 speed_hist = Histogram(speeds, 2 * sbar, 50, density=True)
@@ -163,7 +169,7 @@ speed_hist.draw(speed_ax)
 speed_ax.set_xlim(speed_hist.left[0], speed_hist.right[-1])
 # TODO don't hardcode the upper limit for the histogram speed axis.
 ticks = np.linspace(0, 600, 7, dtype=int)
-speed_ax.set_xticks(ticks * rscale/tscale)
+speed_ax.set_xticks(ticks * rscale / tscale)
 speed_ax.set_xticklabels([str(tick) for tick in ticks])
 speed_ax.set_yticks([])
 
@@ -176,7 +182,7 @@ a = sim.m / 2 / mean_KE
 # looks smooth.
 sgrid_hi = np.linspace(0, speed_hist.bins[-1], 200)
 f = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
-mb_line, = speed_ax.plot(sgrid_hi, f, c='0.7')
+(mb_line,) = speed_ax.plot(sgrid_hi, f, c="0.7")
 # Maximum value of the 2D Maxwell-Boltzmann speed distribution.
 fmax = np.sqrt(sim.m / mean_KE / np.e)
 speed_ax.set_ylim(0, fmax)
@@ -184,19 +190,22 @@ speed_ax.set_ylim(0, fmax)
 # For the distribution derived by averaging, take the abcissa speed points from
 # the centre of the histogram bars.
 sgrid = (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
-mb_est_line, = speed_ax.plot([], [], c='r')
+(mb_est_line,) = speed_ax.plot([], [], c="r")
 mb_est = np.zeros(len(sgrid))
 
 # A text label indicating the time and step number for each animation frame.
 xlabel, ylabel = sgrid[-1] / 2, 0.8 * fmax
-label = speed_ax.text(xlabel, ylabel, '$t$ = {:.1f}s, step = {:d}'.format(0, 0),
-                      backgroundcolor='w')
+label = speed_ax.text(
+    xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
+)
+
 
 def init_anim():
     """Initialize the animation"""
     particles.set_data([], [])
 
     return particles, speed_hist.patch, mb_est_line, label
+
 
 def animate(i):
     """Advance the animation by one step and update the frame."""
@@ -216,15 +225,17 @@ def animate(i):
         mb_est += (speed_hist.hist - mb_est) / (i - IAV_START + 1)
         mb_est_line.set_data(sgrid, mb_est)
 
-    label.set_text('$t$ = {:.1f} ns, step = {:d}'.format(i*dt, i))
+    label.set_text(f"$t$ = {i * dt:.1f} ns, step = {i:d}")
 
     return particles, speed_hist.patch, mb_est_line, label
+
 
 # Only start averaging the speed distribution after frame number IAV_ST.
 IAV_START = 1000
 # Number of frames; set to None to run until explicitly quit.
 frames = 1000
-anim = FuncAnimation(fig, animate, frames=frames, interval=10, blit=False,
-                    init_func=init_anim)
-anim.save('a.gif', writer='Pillow')
+anim = FuncAnimation(
+    fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
+)
+anim.save("a.gif", writer="Pillow")
 plt.show()
