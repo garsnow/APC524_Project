@@ -55,4 +55,5 @@ jobs:
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
 
-      - run: pytest
+      - name: Test package
+        run: python -m pytest -ra
