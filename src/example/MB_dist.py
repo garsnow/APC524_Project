@@ -41,7 +41,7 @@ class MDSimulation:
         iarr, jarr = iarr[k], jarr[k]
 
         # For each collision (perfect elastic), update the velocities of the particles involved. 
-        for i, j in zip(iarr, jarr, strict=False):
+        for i, j in zip(iarr, jarr):
             pos_i, vel_i = self.pos[i], self.vel[i]
             pos_j, vel_j = self.pos[j], self.vel[j]
             rel_pos, rel_vel = pos_i - pos_j, vel_i - vel_j
