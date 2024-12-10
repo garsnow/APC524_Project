@@ -1,3 +1,4 @@
+from scipy.stats import kstest
 import numpy as np
 import pytest
 from md_simulation import MDSimulation, get_speeds
@@ -5,7 +6,6 @@ from md_simulation import MDSimulation, get_speeds
 cutoff = 0.05
 
 def is_maxwell_boltzmann(speeds, m, T):
-    from scipy.stats import kstest
     kb = 1.38e-23
     a = np.sqrt(m / (2 * kb * T))
     cdf = lambda v: (2 / np.sqrt(np.pi)) * (a ** 3) * v ** 2 * np.exp(-a ** 2 * v ** 2)
