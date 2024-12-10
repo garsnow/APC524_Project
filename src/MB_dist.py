@@ -103,7 +103,25 @@ class MDSimulation:
     
             p1.vel = p1.vel - (2*m2/(m1+m2))*factor*r12
             p2.vel = p2.vel + (2*m1/(m1+m2))*factor*r12
+
+        # Bounce the particles off the walls where necessary, by reflecting
+        # their velocity vectors.
+        hit_left_wall = self.pos[:, X] < self.r
+        hit_right_wall = self.pos[:, X] > 1 - self.r
         
+        #adjust positions to be within bounds
+        self.vel[hit_left_wall | hit_right_wall, X] *= -1
+        self.pos[hit_left_wall, self.X] = self.r
+        self.pos[hit_right_wall, self.X] = 1 - self.r
+
+        hit_bottom_wall = self.pos[:, Y] < self.r
+        hit_top_wall = self.pos[:, Y] > 1 - self.r
+
+        self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
+        self.pos[hit_bottom_wall, self.Y] = self.r
+        self.pos[hit_top_wall, self.Y] = 1 - self.r
+
+
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
 
