@@ -13,9 +13,9 @@ class Particle:
     #defines a particle which is an instance of a species
     
     def __init__(self, species, pos, vel):
-    self.species = species 
-    self.pos = np.array(pos, dtype = float)
-    self.vel = np.array(vel, dtype = float)
+        self.species = species 
+        self.pos = np.array(pos, dtype = float)
+        self.vel = np.array(vel, dtype = float)
 
     @property
     def mass(self):
