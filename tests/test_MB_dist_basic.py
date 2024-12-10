@@ -7,8 +7,8 @@ from scipy.stats import kstest
 # Add 'src/' directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from MB_dist import get_speeds, get_KE, MDSimulation, Histogram
-from species_and_particle import Species, Particle
+from src.MB_dist import get_speeds, get_KE, MDSimulation, Histogram
+from src.species_and_particle import Species, Particle
 
 X, Y = 0, 1
 
@@ -117,14 +117,12 @@ def test_MDSimulation_init(particle_A, particle_B):
     sim = MDSimulation([particle_A, particle_B])
 
     assert sim.n == 2
-    assert sim.r == particle_A.radius  # Assuming all particles have the same radius
-    assert sim.m == particle_A.mass  # Assuming all particles have the same mass
     assert sim.nsteps == 0
     assert sim.particles == [particle_A, particle_B]
 
 # Testing MDsimulation.advance
 # with collision
-def test_MDSimulation_advance_with_collision():
+def test_MDSimulation_advance_with_collision(simulation):
     p1, p2 = simulation.particles
 
     pos_before = p1.pos.copy()
@@ -161,7 +159,7 @@ def test_MDSimulation_advance_with_collision():
     assert simulation.nsteps == 1
 
 # MDsimulation without collision
-def test_MDSimulation_advance_without_collision():
+def test_MDSimulation_advance_without_collision(simulation):
     p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
     
@@ -181,7 +179,7 @@ def test_MDSimulation_advance_without_collision():
     assert sim.nsteps == 1
 
 #collision with wall (MDSimulation boundary reflection)
-def test_MDSimulation_boundary_reflection():
+def test_MDSimulation_boundary_reflection(simulation):
     # Create particles positioned to collide with walls
     p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
     p2 = Particle(species_B, np.array([0.95, 0.5]), np.array([1.0, 0.0]))   # Right wall

@@ -168,6 +168,8 @@ class Histogram:
 
 def get_speeds(particles):
     """Return the magnitude of the (n,2) array of velocities, vel."""
+    if not particles:
+        return np.array([])
     vel = np.array([p.vel for p in particles])
     return np.hypot(vel[:, X], vel[:, Y])
 
