@@ -229,3 +229,22 @@ def test_Histogram_update():
     expected_top = np.zeros(len(expected_hist)) + expected_hist
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
     
+def test_MDSimulation_reaction(species_A, species_B, species_C):
+    # Create species A and B particles positioned to collide
+    p1 = Particle(species_A, np.array([0.4, 0.5]), np.array([1.0, 0.0]))
+    p2 = Particle(species_B, np.array([0.6, 0.5]), np.array([-1.0, 0.0]))
+    
+    sim = MDSimulation([p1, p2])
+    dt = 0.1
+    sim.advance(dt)
+    
+    # After advance, particles should have reacted to form a new C particle
+    assert len(sim.particles) == 1  # Only species C remains
+    new_p = sim.particles[0]
+    assert new_p.species.name == "C"
+    expected_pos = 0.5 * (p1.pos + p2.pos)
+    expected_vel = (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
+    
+    np.testing.assert_array_almost_equal(new_p.pos, expected_pos)
+    np.testing.assert_array_almost_equal(new_p.vel, expected_vel)
+    assert sim.nsteps == 1
