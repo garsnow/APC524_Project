@@ -1,5 +1,4 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -24,6 +23,7 @@ class MDSimulation:
         self.particles = particles
         self.n = len(particles)
         self.nsteps = 0
+        self.reactions = []
 
     def advance(self, dt):
             self.nsteps += 1
@@ -38,14 +38,24 @@ class MDSimulation:
             radii = np.array([p.radius for p in self.particles])
             sum_r = np.add.outer(radii, radii)
 
-            # Identify collisions (dist < sum of radii and not zero)
-            iarr, jarr = np.where((dist < sum_r) & (dist > 0))
+            # Identify collisions (dist <= sum of radii and not zero)
+            iarr, jarr = np.where((dist <= sum_r) & (dist > 0))
             k = iarr < jarr
             iarr, jarr = iarr[k], jarr[k]
 
             # Resolve particle collisions
             for i, j in zip(iarr, jarr):
                 self.resolve_collision(self.particles[i], self.particles[j])
+
+            #delete A,B and add C to particles list
+            if self.reactions:
+                for (p1, p2, new_p) in self.reactions:
+                    if p1 in self.particles:
+                        self.particles.remove(p1)
+                    if p2 in self.particles:
+                        self.particles.remove(p2)
+                    self.particles.append(new_p)
+                self.reactions.clear()
 
             # Wall collisions
             for p in self.particles:
@@ -66,18 +76,33 @@ class MDSimulation:
                 elif p.pos[Y] > 1 - p.radius:
                     p.pos[Y] = 1 - p.radius
                     p.vel[Y] *= -1
-
+    
+    # treats particle collision as elastic
     def resolve_collision(self, p1, p2):
-        # Two-body elastic collision
-        m1, m2 = p1.mass, p2.mass
-        r12 = p1.pos - p2.pos
-        v12 = p1.vel - p2.vel
-        r12_sq = np.dot(r12, r12)
-        # Project v12 onto r12
-        factor = np.dot(v12, r12) / r12_sq
+        #if collision between A&B --> C
+        if (p1.species.name == "A" and p2.species.name == "B") or (p1.species.name == "B" and p2.species.name == "A"):
+            new_pos = .5 * (p1.pos + p2.pos)
+            m1, m2 = p1.mass, p2.mass
+            total_mass = m1 + m2
+            new_vel = (m1 * p1.vel + m2 * p2.vel) / total_mass
+        
+            species_C = Species(name="C", mass=3.0, radius=0.03, color='purple') 
+            new_particle = Particle(species_C, new_pos, new_vel)
 
-        p1.vel = p1.vel - (2*m2/(m1+m2))*factor*r12
-        p2.vel = p2.vel + (2*m1/(m1+m2))*factor*r12
+            # remove A + B and add C to particles list 
+            self.reactions.append((p1, p2, new_particle))
+
+        #otherwise elastic collision
+        else: 
+            m1, m2 = p1.mass, p2.mass
+            r12 = p1.pos - p2.pos
+            v12 = p1.vel - p2.vel
+            r12_sq = np.dot(r12, r12)
+            # Project v12 onto r12
+            factor = np.dot(v12, r12) / r12_sq
+    
+            p1.vel = p1.vel - (2*m2/(m1+m2))*factor*r12
+            p2.vel = p2.vel + (2*m1/(m1+m2))*factor*r12
         
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
@@ -139,10 +164,11 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(num_A, num_B,time_step):
+def particle_simulator(num_A, num_B, time_step, num_C = 0):
     # Define two species with different properties
     species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
     species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
+    species_C = Species(name="C", mass=3.0, radius=0.03, color='purple') 
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
@@ -152,8 +178,12 @@ def particle_simulator(num_A, num_B,time_step):
     pos_B = np.random.rand(num_B, 2) * 0.4 + 0.55  # right side
     vel_B = (np.random.rand(num_B, 2) - 0.5)
 
+    pos_C = np.random.rand(num_C, 2) * 0.4 + 0.55  # right side
+    vel_C = (np.random.rand(num_C, 2) - 0.5)
+
     particles = [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)] + \
-                [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
+                [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)] + \
+                [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
 
     sim = MDSimulation(particles)
 
@@ -173,8 +203,6 @@ def particle_simulator(num_A, num_B,time_step):
     y = [p.pos[Y] for p in sim.particles]
     colors = [p.color for p in sim.particles]
     scatter = ax.scatter(x, y, c=colors, s=30)
-
-    #label = ax.text(0.05, 0.95, "", transform=ax.transAxes, va='top', backgroundcolor='white')
 
     # The 2D Maxwell-Boltzmann equilibrium distribution of speeds.
 
@@ -231,8 +259,9 @@ def particle_simulator(num_A, num_B,time_step):
     
         x = [p.pos[X] for p in sim.particles]
         y = [p.pos[Y] for p in sim.particles]
+        colors = [p.color for p in sim.particles]
+        scatter.set_facecolors(colors)
         scatter.set_offsets(np.column_stack((x, y)))
-        #scatter.set_sizes([30]*sim.n)
     
         speeds = get_speeds(sim.particles)
         speed_hist.update(speeds)
