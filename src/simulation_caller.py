@@ -11,7 +11,7 @@ def caller(number_of_particles, FPS):
         particle_mass(int): mass of every particle in the simulation.
     '''
     num_A = number_of_particles // 2
-    num_B = number of particles - num_A 
+    num_B = number_of_particles - num_A 
     MB_dist.particle_simulator(num_A, num_B, FPS)
 
 caller(1000,30)
