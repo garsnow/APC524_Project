@@ -24,9 +24,9 @@ tests/test_MB_dist_basic.py::test_MDSimulation_reaction FAILED           [100%]
 =================================== FAILURES ===================================
 ___________________ test_MDSimulation_advance_with_collision ___________________
 
-simulation = <src.MB_dist.MDSimulation object at 0x7f66f6cda320>
-species_A = <src.species_and_particle.Species object at 0x7f66f6cda980>
-species_B = <src.species_and_particle.Species object at 0x7f66f6cda470>
+simulation = <src.MB_dist.MDSimulation object at 0x7fc232c4d420>
+species_A = <src.species_and_particle.Species object at 0x7fc232c4e140>
+species_B = <src.species_and_particle.Species object at 0x7fc232c4d960>
 
     def test_MDSimulation_advance_with_collision(simulation, species_A, species_B):
         p1, p2 = simulation.particles
@@ -71,14 +71,14 @@ expected_vel_p2 = array([-0.52,  0.64])
 factor     = np.float64(-1.2)
 m1         = 1.0
 m2         = 2.0
-p1         = <src.species_and_particle.Particle object at 0x7f66f6cda890>
-p2         = <src.species_and_particle.Particle object at 0x7f66f6cda380>
+p1         = <src.species_and_particle.Particle object at 0x7fc232c4e3b0>
+p2         = <src.species_and_particle.Particle object at 0x7fc232c4d9f0>
 pos_before = array([0.1, 0.1])
 pos_before_p2 = array([0.9, 0.9])
 r12        = array([-0.6, -0.8])
-simulation = <src.MB_dist.MDSimulation object at 0x7f66f6cda320>
-species_A  = <src.species_and_particle.Species object at 0x7f66f6cda980>
-species_B  = <src.species_and_particle.Species object at 0x7f66f6cda470>
+simulation = <src.MB_dist.MDSimulation object at 0x7fc232c4d420>
+species_A  = <src.species_and_particle.Species object at 0x7fc232c4e140>
+species_B  = <src.species_and_particle.Species object at 0x7fc232c4d960>
 v1_initial = array([1., 0.])
 v2_initial = array([-1.,  0.])
 v_rel      = array([2., 0.])
@@ -121,7 +121,7 @@ E        DESIRED: array([ 0.04, -1.28])
 
 args       = (array([1., 0.]), array([ 0.04, -1.28]))
 dep_version = '2.0.0'
-fun        = <function assert_array_almost_equal at 0x7f67120431c0>
+fun        = <function assert_array_almost_equal at 0x7fc24dc96200>
 kwargs     = {}
 new_name   = 'desired'
 new_names  = ['actual', 'desired']
@@ -131,9 +131,9 @@ old_names  = ['x', 'y']
 ../../../.local/lib/python3.10/site-packages/numpy/_utils/__init__.py:85: AssertionError
 __________________________ test_MDSimulation_reaction __________________________
 
-species_A = <src.species_and_particle.Species object at 0x7f66f6d67940>
-species_B = <src.species_and_particle.Species object at 0x7f66f6d677f0>
-species_C = <src.species_and_particle.Species object at 0x7f66f6d67e80>
+species_A = <src.species_and_particle.Species object at 0x7fc232c4ff10>
+species_B = <src.species_and_particle.Species object at 0x7fc232c4fd30>
+species_C = <src.species_and_particle.Species object at 0x7fc232c4e110>
 
     def test_MDSimulation_reaction(species_A, species_B, species_C):
         # Create species A and B particles positioned to collide
@@ -147,19 +147,19 @@ species_C = <src.species_and_particle.Species object at 0x7f66f6d67e80>
         # After advance, particles should have reacted to form a new C particle
 >       assert len(sim.particles) == 1  # Only species C remains
 E       assert 2 == 1
-E        +  where 2 = len([<src.species_and_particle.Particle object at 0x7f66f6d67eb0>, <src.species_and_particle.Particle object at 0x7f66f6d677c0>])
-E        +    where [<src.species_and_particle.Particle object at 0x7f66f6d67eb0>, <src.species_and_particle.Particle object at 0x7f66f6d677c0>] = <src.MB_dist.MDSimulation object at 0x7f66f6d67760>.particles
+E        +  where 2 = len([<src.species_and_particle.Particle object at 0x7fc232c4fd60>, <src.species_and_particle.Particle object at 0x7fc232c4feb0>])
+E        +    where [<src.species_and_particle.Particle object at 0x7fc232c4fd60>, <src.species_and_particle.Particle object at 0x7fc232c4feb0>] = <src.MB_dist.MDSimulation object at 0x7fc232c4ff70>.particles
 
 dt         = 0.1
-p1         = <src.species_and_particle.Particle object at 0x7f66f6d67eb0>
-p2         = <src.species_and_particle.Particle object at 0x7f66f6d677c0>
-sim        = <src.MB_dist.MDSimulation object at 0x7f66f6d67760>
-species_A  = <src.species_and_particle.Species object at 0x7f66f6d67940>
-species_B  = <src.species_and_particle.Species object at 0x7f66f6d677f0>
-species_C  = <src.species_and_particle.Species object at 0x7f66f6d67e80>
+p1         = <src.species_and_particle.Particle object at 0x7fc232c4fd60>
+p2         = <src.species_and_particle.Particle object at 0x7fc232c4feb0>
+sim        = <src.MB_dist.MDSimulation object at 0x7fc232c4ff70>
+species_A  = <src.species_and_particle.Species object at 0x7fc232c4ff10>
+species_B  = <src.species_and_particle.Species object at 0x7fc232c4fd30>
+species_C  = <src.species_and_particle.Species object at 0x7fc232c4e110>
 
 tests/test_MB_dist_basic.py:244: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_reaction - assert 2 == 1
-========================= 2 failed, 11 passed in 1.90s =========================
+========================= 2 failed, 11 passed in 1.92s =========================
