@@ -15,7 +15,7 @@ tests/test_MB_dist_basic.py::test_get_speeds_empty PASSED                [ 38%]
 tests/test_MB_dist_basic.py::test_get_KE PASSED                          [ 46%]
 tests/test_MB_dist_basic.py::test_MDSimulation_init PASSED               [ 53%]
 tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision FAILED [ 61%]
-tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision FAILED [ 69%]
+tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision PASSED [ 69%]
 tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection FAILED [ 76%]
 tests/test_MB_dist_basic.py::test_Histogram_init PASSED                  [ 84%]
 tests/test_MB_dist_basic.py::test_Histogram_update PASSED                [ 92%]
@@ -24,9 +24,11 @@ tests/test_MB_dist_basic.py::test_MDSimulation_reaction FAILED           [100%]
 =================================== FAILURES ===================================
 ___________________ test_MDSimulation_advance_with_collision ___________________
 
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857c492a0>
+simulation = <src.MB_dist.MDSimulation object at 0x7f413edd28f0>
+species_A = <src.species_and_particle.Species object at 0x7f413edd1ba0>
+species_B = <src.species_and_particle.Species object at 0x7f413edd2860>
 
-    def test_MDSimulation_advance_with_collision(simulation):
+    def test_MDSimulation_advance_with_collision(simulation, species_A, species_B):
         p1, p2 = simulation.particles
     
         pos_before = p1.pos.copy()
@@ -69,12 +71,14 @@ expected_vel_p2 = array([-0.52,  0.64])
 factor     = np.float64(-1.2)
 m1         = 1.0
 m2         = 2.0
-p1         = <src.species_and_particle.Particle object at 0x7f3857c4a020>
-p2         = <src.species_and_particle.Particle object at 0x7f3857c49870>
+p1         = <src.species_and_particle.Particle object at 0x7f413edd1d50>
+p2         = <src.species_and_particle.Particle object at 0x7f413edd2890>
 pos_before = array([0.1, 0.1])
 pos_before_p2 = array([0.9, 0.9])
 r12        = array([-0.6, -0.8])
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857c492a0>
+simulation = <src.MB_dist.MDSimulation object at 0x7f413edd28f0>
+species_A  = <src.species_and_particle.Species object at 0x7f413edd1ba0>
+species_B  = <src.species_and_particle.Species object at 0x7f413edd2860>
 v1_initial = array([1., 0.])
 v2_initial = array([-1.,  0.])
 v_rel      = array([2., 0.])
@@ -117,7 +121,7 @@ E        DESIRED: array([ 0.04, -1.28])
 
 args       = (array([1., 0.]), array([ 0.04, -1.28]))
 dep_version = '2.0.0'
-fun        = <function assert_array_almost_equal at 0x7f3872f11360>
+fun        = <function assert_array_almost_equal at 0x7f415a179480>
 kwargs     = {}
 new_name   = 'desired'
 new_names  = ['actual', 'desired']
@@ -125,102 +129,89 @@ old_name   = 'y'
 old_names  = ['x', 'y']
 
 ../../../.local/lib/python3.10/site-packages/numpy/_utils/__init__.py:85: AssertionError
-_________________ test_MDSimulation_advance_without_collision __________________
-
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857cd7940>
-
-    def test_MDSimulation_advance_without_collision(simulation):
-        p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
-        p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
-    
-        sim = MDSimulation([p1, p2])
-        dt = 0.1
->       sim.advance(dt)
-
-dt         = 0.1
-p1         = <src.species_and_particle.Particle object at 0x7f3857cd7a30>
-p2         = <src.species_and_particle.Particle object at 0x7f3857cd7bb0>
-sim        = <src.MB_dist.MDSimulation object at 0x7f3857cd78b0>
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857cd7940>
-
-tests/test_MB_dist_basic.py:168: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/MB_dist.py:42: in advance
-    radii = np.array([p.radius for p in self.particles])
-        dist_matrix = array([[       inf, 0.86023253],
-       [0.86023253,        inf]])
-        dt         = 0.1
-        p          = <src.species_and_particle.Particle object at 0x7f3857cd7bb0>
-        pos_array  = array([[0.3, 0.2],
-       [0.8, 0.9]])
-        self       = <src.MB_dist.MDSimulation object at 0x7f3857cd78b0>
-src/MB_dist.py:42: in <listcomp>
-    radii = np.array([p.radius for p in self.particles])
-        .0         = <list_iterator object at 0x7f3857cd7820>
-        p          = <src.species_and_particle.Particle object at 0x7f3857cd7a30>
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <src.species_and_particle.Particle object at 0x7f3857cd7a30>
-
-    @property
-    def radius(self):
->       return self.species.radius
-E       AttributeError: 'function' object has no attribute 'radius'
-
-self       = <src.species_and_particle.Particle object at 0x7f3857cd7a30>
-
-src/species_and_particle.py:26: AttributeError
 ____________________ test_MDSimulation_boundary_reflection _____________________
 
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857c4be20>
+simulation = <src.MB_dist.MDSimulation object at 0x7f413ee63910>
+species_A = <src.species_and_particle.Species object at 0x7f413ee63c40>
+species_B = <src.species_and_particle.Species object at 0x7f413ee63cd0>
 
-    def test_MDSimulation_boundary_reflection(simulation):
+    def test_MDSimulation_boundary_reflection(simulation, species_A, species_B):
         # Create particles positioned to collide with walls
         p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
         p2 = Particle(species_B, np.array([0.95, 0.5]), np.array([1.0, 0.0]))   # Right wall
     
         sim = MDSimulation([p1, p2])
         dt = 0.1
->       sim.advance(dt)
+        sim.advance(dt)
+    
+        expected_pos_p1 = np.array([0.05, 0.5])  # Should be set back to radius
+        expected_pos_p2 = np.array([0.95, 0.5])  # Should be set back to 1 - radius
+        expected_vel_p1 = np.array([1.0, 0.0])   # Reversed
+        expected_vel_p2 = np.array([-1.0, 0.0])  # Reversed
+    
+>       np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
 
 dt         = 0.1
-p1         = <src.species_and_particle.Particle object at 0x7f3857c4bd30>
-p2         = <src.species_and_particle.Particle object at 0x7f3857c49990>
-sim        = <src.MB_dist.MDSimulation object at 0x7f3857c4bd90>
-simulation = <src.MB_dist.MDSimulation object at 0x7f3857c4be20>
+expected_pos_p1 = array([0.05, 0.5 ])
+expected_pos_p2 = array([0.95, 0.5 ])
+expected_vel_p1 = array([1., 0.])
+expected_vel_p2 = array([-1.,  0.])
+p1         = <src.species_and_particle.Particle object at 0x7f413ee63bb0>
+p2         = <src.species_and_particle.Particle object at 0x7f413ee63ee0>
+sim        = <src.MB_dist.MDSimulation object at 0x7f413ee63820>
+simulation = <src.MB_dist.MDSimulation object at 0x7f413ee63910>
+species_A  = <src.species_and_particle.Species object at 0x7f413ee63c40>
+species_B  = <src.species_and_particle.Species object at 0x7f413ee63cd0>
 
-tests/test_MB_dist_basic.py:189: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/MB_dist.py:42: in advance
-    radii = np.array([p.radius for p in self.particles])
-        dist_matrix = array([[inf, 1.1],
-       [1.1, inf]])
-        dt         = 0.1
-        p          = <src.species_and_particle.Particle object at 0x7f3857c49990>
-        pos_array  = array([[-0.05,  0.5 ],
-       [ 1.05,  0.5 ]])
-        self       = <src.MB_dist.MDSimulation object at 0x7f3857c4bd90>
-src/MB_dist.py:42: in <listcomp>
-    radii = np.array([p.radius for p in self.particles])
-        .0         = <list_iterator object at 0x7f3857c4ba60>
-        p          = <src.species_and_particle.Particle object at 0x7f3857c4bd30>
+tests/test_MB_dist_basic.py:196: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-self = <src.species_and_particle.Particle object at 0x7f3857c4bd30>
+args = (array([0.01, 0.5 ]), array([0.05, 0.5 ])), kwargs = {}, old_name = 'y'
+new_name = 'desired'
 
-    @property
-    def radius(self):
->       return self.species.radius
-E       AttributeError: 'function' object has no attribute 'radius'
+    @functools.wraps(fun)
+    def wrapper(*args, **kwargs):
+        for old_name, new_name in zip(old_names, new_names):
+            if old_name in kwargs:
+                if dep_version:
+                    end_version = dep_version.split('.')
+                    end_version[1] = str(int(end_version[1]) + 2)
+                    end_version = '.'.join(end_version)
+                    msg = (f"Use of keyword argument `{old_name}` is "
+                           f"deprecated and replaced by `{new_name}`. "
+                           f"Support for `{old_name}` will be removed "
+                           f"in NumPy {end_version}.")
+                    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+                if new_name in kwargs:
+                    msg = (f"{fun.__name__}() got multiple values for "
+                           f"argument now known as `{new_name}`")
+                    raise TypeError(msg)
+                kwargs[new_name] = kwargs.pop(old_name)
+>       return fun(*args, **kwargs)
+E       AssertionError: 
+E       Arrays are not almost equal to 6 decimals
+E       
+E       Mismatched elements: 1 / 2 (50%)
+E       Max absolute difference among violations: 0.04
+E       Max relative difference among violations: 0.8
+E        ACTUAL: array([0.01, 0.5 ])
+E        DESIRED: array([0.05, 0.5 ])
 
-self       = <src.species_and_particle.Particle object at 0x7f3857c4bd30>
+args       = (array([0.01, 0.5 ]), array([0.05, 0.5 ]))
+dep_version = '2.0.0'
+fun        = <function assert_array_almost_equal at 0x7f415a179480>
+kwargs     = {}
+new_name   = 'desired'
+new_names  = ['actual', 'desired']
+old_name   = 'y'
+old_names  = ['x', 'y']
 
-src/species_and_particle.py:26: AttributeError
+../../../.local/lib/python3.10/site-packages/numpy/_utils/__init__.py:85: AssertionError
 __________________________ test_MDSimulation_reaction __________________________
 
-species_A = <src.species_and_particle.Species object at 0x7f3857b53cd0>
-species_B = <src.species_and_particle.Species object at 0x7f3857b53a60>
-species_C = <src.species_and_particle.Species object at 0x7f3857b53a00>
+species_A = <src.species_and_particle.Species object at 0x7f413ee4b7c0>
+species_B = <src.species_and_particle.Species object at 0x7f413ee4b790>
+species_C = <src.species_and_particle.Species object at 0x7f413ee4b730>
 
     def test_MDSimulation_reaction(species_A, species_B, species_C):
         # Create species A and B particles positioned to collide
@@ -234,21 +225,20 @@ species_C = <src.species_and_particle.Species object at 0x7f3857b53a00>
         # After advance, particles should have reacted to form a new C particle
 >       assert len(sim.particles) == 1  # Only species C remains
 E       assert 2 == 1
-E        +  where 2 = len([<src.species_and_particle.Particle object at 0x7f3857b53880>, <src.species_and_particle.Particle object at 0x7f3857b53970>])
-E        +    where [<src.species_and_particle.Particle object at 0x7f3857b53880>, <src.species_and_particle.Particle object at 0x7f3857b53970>] = <src.MB_dist.MDSimulation object at 0x7f3857b53850>.particles
+E        +  where 2 = len([<src.species_and_particle.Particle object at 0x7f413ee49720>, <src.species_and_particle.Particle object at 0x7f413ee4b760>])
+E        +    where [<src.species_and_particle.Particle object at 0x7f413ee49720>, <src.species_and_particle.Particle object at 0x7f413ee4b760>] = <src.MB_dist.MDSimulation object at 0x7f413ee48f70>.particles
 
 dt         = 0.1
-p1         = <src.species_and_particle.Particle object at 0x7f3857b53880>
-p2         = <src.species_and_particle.Particle object at 0x7f3857b53970>
-sim        = <src.MB_dist.MDSimulation object at 0x7f3857b53850>
-species_A  = <src.species_and_particle.Species object at 0x7f3857b53cd0>
-species_B  = <src.species_and_particle.Species object at 0x7f3857b53a60>
-species_C  = <src.species_and_particle.Species object at 0x7f3857b53a00>
+p1         = <src.species_and_particle.Particle object at 0x7f413ee49720>
+p2         = <src.species_and_particle.Particle object at 0x7f413ee4b760>
+sim        = <src.MB_dist.MDSimulation object at 0x7f413ee48f70>
+species_A  = <src.species_and_particle.Species object at 0x7f413ee4b7c0>
+species_B  = <src.species_and_particle.Species object at 0x7f413ee4b790>
+species_C  = <src.species_and_particle.Species object at 0x7f413ee4b730>
 
 tests/test_MB_dist_basic.py:244: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision
-FAILED tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection - A...
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_reaction - assert 2 == 1
-========================= 4 failed, 9 passed in 1.95s ==========================
+========================= 3 failed, 10 passed in 1.89s =========================
