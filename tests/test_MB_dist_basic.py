@@ -14,15 +14,15 @@ X, Y = 0, 1
 
 @pytest.fixture
 def species_A():
-    return Species(name="A", mass=1.0, radius=0.05, color="red")
+    return Species(name="A", mass=1.0, radius=0.5, color="red")
 
 @pytest.fixture
 def species_B():
-    return Species(name="B", mass=2.0, radius=0.05, color="blue")
+    return Species(name="B", mass=2.0, radius=0.5, color="blue")
 
 @pytest.fixture
 def species_C():
-    return Species(name="C", mass=3.0, radius=0.05, color='purple')
+    return Species(name="C", mass=3.0, radius=0.5, color='purple')
 
 @pytest.fixture
 def particle_A(species_A):
