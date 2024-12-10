@@ -104,7 +104,7 @@ class MDSimulation:
             r12_sq = np.dot(r12, r12)
             
             if r12_sq == 0:
-                separation - p1.radius * 1e-3
+                separation = p1.radius * 1e-3
                 p1.pos[X] += separation
                 p2.pos[X] -= separation
                 r12 = p1.pos - p2.pos
