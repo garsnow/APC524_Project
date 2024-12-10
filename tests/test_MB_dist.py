@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from md_simulation import MDSimulation, get_speeds
+from MD_dist import MDSimulation, get_speeds
 from scipy.stats import kstest
 
 cutoff = 0.05
