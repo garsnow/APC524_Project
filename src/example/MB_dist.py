@@ -1,5 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
@@ -8,66 +10,129 @@ from scipy.spatial.distance import pdist, squareform
 
 X, Y = 0, 1
 
+class MDSimulation:
+
+    def __init__(self, pos, vel, r, m):
+        """
+        Initialize the simulation with identical, circular particles of radius
+        r and mass m. The n x 2 state arrays pos and vel hold the n particles'
+        positions in their rows as (x_i, y_i) and (vx_i, vy_i).
+
+        """
+
+        self.pos = np.asarray(pos, dtype=float)
+        self.vel = np.asarray(vel, dtype=float)
+        self.n = self.pos.shape[0]
+        self.r = r
+        self.m = m
+        self.nsteps = 0
+
+    def advance(self, dt):
+        """Advance the simulation by dt seconds."""
+
+        self.nsteps += 1
+        # Update the particles' positions according to their velocities.
+        self.pos += self.vel * dt
+        # Find indices for all unique collisions.
+        dist = squareform(pdist(self.pos))
+        # Definition for hard sphere collisions
+        iarr, jarr = np.where(dist < 2 * self.r)
+        k = iarr < jarr
+        iarr, jarr = iarr[k], jarr[k]
+
+        # For each collision (perfect elastic), update the velocities of the particles involved. 
+        for i, j in zip(iarr, jarr, strict=False):
+            pos_i, vel_i = self.pos[i], self.vel[i]
+            pos_j, vel_j = self.pos[j], self.vel[j]
+            rel_pos, rel_vel = pos_i - pos_j, vel_i - vel_j
+            r_rel = rel_pos @ rel_pos
+            v_rel = rel_vel @ rel_pos
+            v_rel = 2 * rel_pos * v_rel / r_rel - rel_vel
+            v_cm = (vel_i + vel_j) / 2
+            self.vel[i] = v_cm - v_rel / 2
+            self.vel[j] = v_cm + v_rel / 2
+
+        # Bounce the particles off the walls where necessary, by reflecting
+        # their velocity vectors.
+        hit_left_wall = self.pos[:, X] < self.r
+        hit_right_wall = self.pos[:, X] > 1 - self.r
+        hit_bottom_wall = self.pos[:, Y] < self.r
+        hit_top_wall = self.pos[:, Y] > 1 - self.r
+        self.vel[hit_left_wall | hit_right_wall, X] *= -1
+        self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
+        
+class Histogram:
+    """A class to draw a Matplotlib histogram as a collection of Patches."""
+
+    def __init__(self, data, xmax, nbars, density=False):
+        """Initialize the histogram from the data and requested bins."""
+        self.nbars = nbars
+        self.density = density
+        self.bins = np.linspace(0, xmax, nbars)
+        self.hist, bins = np.histogram(data, self.bins, density=density)
+
+        # Drawing the histogram with Matplotlib patches owes a lot to
+        # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
+        # Get the corners of the rectangles for the histogram.
+        self.left = np.array(bins[:-1])
+        self.right = np.array(bins[1:])
+        self.bottom = np.zeros(len(self.left))
+        self.top = self.bottom + self.hist
+        nrects = len(self.left)
+        self.nverts = nrects * 5
+        self.verts = np.zeros((self.nverts, 2))
+        self.verts[0::5, 0] = self.left
+        self.verts[0::5, 1] = self.bottom
+        self.verts[1::5, 0] = self.left
+        self.verts[1::5, 1] = self.top
+        self.verts[2::5, 0] = self.right
+        self.verts[2::5, 1] = self.top
+        self.verts[3::5, 0] = self.right
+        self.verts[3::5, 1] = self.bottom
+
+    def draw(self, ax):
+        """Draw the histogram by adding appropriate patches to Axes ax."""
+        codes = np.ones(self.nverts, int) * path.Path.LINETO
+        codes[0::5] = path.Path.MOVETO
+        codes[4::5] = path.Path.CLOSEPOLY
+        barpath = path.Path(self.verts, codes)
+        self.patch = patches.PathPatch(
+                barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
+                )
+        ax.add_patch(self.patch)
+
+    def update(self, data):
+        """Update the rectangle vertices using a new histogram from data."""
+        self.hist, bins = np.histogram(data, self.bins, density=self.density)
+        self.top = self.bottom + self.hist
+        self.verts[1::5, 1] = self.top
+        self.verts[2::5, 1] = self.top
+
+
+
+def get_speeds(vel):
+    """Return the magnitude of the (n,2) array of velocities, vel."""
+    return np.hypot(vel[:, X], vel[:, Y])
+
+
+def get_KE(m, speeds):
+    """Return the total kinetic energy of all particles in scaled units."""
+    return 0.5 * m * np.sum(speeds**2)
+
+
 def particle_simulator(number_of_particles,time_step,particle_mass):
-    class MDSimulation:
-    
-        def __init__(self, pos, vel, r, m):
-            """
-            Initialize the simulation with identical, circular particles of radius
-            r and mass m. The n x 2 state arrays pos and vel hold the n particles'
-            positions in their rows as (x_i, y_i) and (vx_i, vy_i).
-    
-            """
-    
-            self.pos = np.asarray(pos, dtype=float)
-            self.vel = np.asarray(vel, dtype=float)
-            self.n = self.pos.shape[0]
-            self.r = r
-            self.m = m
-            self.nsteps = 0
-    
-        def advance(self, dt):
-            """Advance the simulation by dt seconds."""
-    
-            self.nsteps += 1
-            # Update the particles' positions according to their velocities.
-            self.pos += self.vel * dt
-            # Find indices for all unique collisions.
-            dist = squareform(pdist(self.pos))
-            iarr, jarr = np.where(dist < 2 * self.r)
-            k = iarr < jarr
-            iarr, jarr = iarr[k], jarr[k]
-    
-            # For each collision, update the velocities of the particles involved.
-            for i, j in zip(iarr, jarr):
-                pos_i, vel_i = self.pos[i], self.vel[i]
-                pos_j, vel_j = self.pos[j], self.vel[j]
-                rel_pos, rel_vel = pos_i - pos_j, vel_i - vel_j
-                r_rel = rel_pos @ rel_pos
-                v_rel = rel_vel @ rel_pos
-                v_rel = 2 * rel_pos * v_rel / r_rel - rel_vel
-                v_cm = (vel_i + vel_j) / 2
-                self.vel[i] = v_cm - v_rel / 2
-                self.vel[j] = v_cm + v_rel / 2
-    
-            # Bounce the particles off the walls where necessary, by reflecting
-            # their velocity vectors.
-            hit_left_wall = self.pos[:, X] < self.r
-            hit_right_wall = self.pos[:, X] > 1 - self.r
-            hit_bottom_wall = self.pos[:, Y] < self.r
-            hit_top_wall = self.pos[:, Y] > 1 - self.r
-            self.vel[hit_left_wall | hit_right_wall, X] *= -1
-            self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
-    
-    
+
+
     # Number of particles.
     n = number_of_particles
     # Scaling factor for distance, m-1. The box dimension is therefore 1/rscale.
     rscale = 5.0e6
     # Use the van der Waals radius of Ar, about 0.2 nm.
     r = 2e-10 * rscale
-    # Scale time by this factor, in s-1.
-    tscale = 1e9  # i.e. time will be measured in nanoseconds.
+
+    # Scale time by this factor, in s-1. (nanoseconds)
+    tscale = 1e9  
+
     # Take the mean speed to be the root-mean-square velocity of Ar at 300 K.
     sbar = 353 * rscale / tscale
     # Time step in scaled time units.
@@ -104,65 +169,6 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     
     (particles,) = sim_ax.plot([], [], "ko")
     
-    
-    class Histogram:
-        """A class to draw a Matplotlib histogram as a collection of Patches."""
-    
-        def __init__(self, data, xmax, nbars, density=False):
-            """Initialize the histogram from the data and requested bins."""
-            self.nbars = nbars
-            self.density = density
-            self.bins = np.linspace(0, xmax, nbars)
-            self.hist, bins = np.histogram(data, self.bins, density=density)
-    
-            # Drawing the histogram with Matplotlib patches owes a lot to
-            # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
-            # Get the corners of the rectangles for the histogram.
-            self.left = np.array(bins[:-1])
-            self.right = np.array(bins[1:])
-            self.bottom = np.zeros(len(self.left))
-            self.top = self.bottom + self.hist
-            nrects = len(self.left)
-            self.nverts = nrects * 5
-            self.verts = np.zeros((self.nverts, 2))
-            self.verts[0::5, 0] = self.left
-            self.verts[0::5, 1] = self.bottom
-            self.verts[1::5, 0] = self.left
-            self.verts[1::5, 1] = self.top
-            self.verts[2::5, 0] = self.right
-            self.verts[2::5, 1] = self.top
-            self.verts[3::5, 0] = self.right
-            self.verts[3::5, 1] = self.bottom
-    
-        def draw(self, ax):
-            """Draw the histogram by adding appropriate patches to Axes ax."""
-            codes = np.ones(self.nverts, int) * path.Path.LINETO
-            codes[0::5] = path.Path.MOVETO
-            codes[4::5] = path.Path.CLOSEPOLY
-            barpath = path.Path(self.verts, codes)
-            self.patch = patches.PathPatch(
-                    barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
-                    )
-            ax.add_patch(self.patch)
-    
-        def update(self, data):
-            """Update the rectangle vertices using a new histogram from data."""
-            self.hist, bins = np.histogram(data, self.bins, density=self.density)
-            self.top = self.bottom + self.hist
-            self.verts[1::5, 1] = self.top
-            self.verts[2::5, 1] = self.top
-
-
-    def get_speeds(vel):
-        """Return the magnitude of the (n,2) array of velocities, vel."""
-        return np.hypot(vel[:, X], vel[:, Y])
-    
-    
-    def get_KE(speeds):
-        """Return the total kinetic energy of all particles in scaled units."""
-        return 0.5 * sim.m * sum(speeds**2)
-    
-    
     speeds = get_speeds(sim.vel)
     speed_hist = Histogram(speeds, 2 * sbar, 50, density=True)
     speed_hist.draw(speed_ax)
@@ -176,7 +182,8 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     fig.tight_layout()
     
     # The 2D Maxwell-Boltzmann equilibrium distribution of speeds.
-    mean_KE = get_KE(speeds) / n
+
+    mean_KE = get_KE(m, speeds) / n
     a = sim.m / 2 / mean_KE
     # Use a high-resolution grid of speed points so that the exact distribution
     # looks smooth.
@@ -209,7 +216,8 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     
     def animate(i):
         """Advance the animation by one step and update the frame."""
-        #global sim, verts, mb_est_line, mb_est
+
+        nonlocal mb_est
         sim.advance(dt)
     
         particles.set_data(sim.pos[:, X], sim.pos[:, Y])
@@ -237,5 +245,6 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     anim = FuncAnimation(
             fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
             )
-    anim.save("MB_simulation.gif", writer="Pillow")
+
+    anim.save("MB_simulation.gif", writer="pillow")
     plt.show()
