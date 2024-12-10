@@ -2,8 +2,12 @@ import os
 import sys
 import pytest
 import numpy as np
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.MB_dist import get_speeds, get_KE, MDSimulation, Histogram
+from scipy.stats import kstest
+
+# Add 'src/' directory to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+from MB_dist import get_speeds, get_KE, MDSimulation, Histogram
 from species_and_particle import Species, Particle
 
 X, Y = 0, 1

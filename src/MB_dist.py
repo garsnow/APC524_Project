@@ -8,7 +8,7 @@ from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
 
 #imports classes needed
-from .species_and_particle import Species, Particle
+from species_and_particle import Species, Particle
 
 X, Y = 0, 1
 
