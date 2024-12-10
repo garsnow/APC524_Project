@@ -122,7 +122,7 @@ def test_MDSimulation_init(particle_A, particle_B):
 
 # Testing MDsimulation.advance
 # with collision
-def test_MDSimulation_advance_with_collision(simulation):
+def test_MDSimulation_advance_with_collision(simulation, species_A, species_B):
     p1, p2 = simulation.particles
 
     pos_before = p1.pos.copy()
@@ -159,7 +159,7 @@ def test_MDSimulation_advance_with_collision(simulation):
     assert simulation.nsteps == 1
 
 # MDsimulation without collision
-def test_MDSimulation_advance_without_collision(simulation):
+def test_MDSimulation_advance_without_collision(simulation, species_A, species_B):
     p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
     
@@ -179,7 +179,7 @@ def test_MDSimulation_advance_without_collision(simulation):
     assert sim.nsteps == 1
 
 #collision with wall (MDSimulation boundary reflection)
-def test_MDSimulation_boundary_reflection(simulation):
+def test_MDSimulation_boundary_reflection(simulation, species_A, species_B):
     # Create particles positioned to collide with walls
     p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
     p2 = Particle(species_B, np.array([0.95, 0.5]), np.array([1.0, 0.0]))   # Right wall
