@@ -13,6 +13,14 @@ test = ["pytest"]
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+    "src"
+]
+
 [tool.ruff.lint]
 extend-select = [
   "B",        # flake8-bugbear
