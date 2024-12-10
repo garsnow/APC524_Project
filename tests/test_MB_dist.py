@@ -40,6 +40,9 @@ def test_maxwell_boltzmann_distribution() -> None:
     time_step = 30
     particle_mass = 1
     sim = particle_simulator(number_of_particles, time_step, particle_mass)
+    num_steps = 1000
+    for j in range(num_steps):
+        sim.advance(1 / time_step)
     speeds = get_speeds(sim.vel)
     assert is_maxwell_boltzmann(speeds, particle_mass, T=300), "Does not match Maxwell-Boltzmann distribution"
 
