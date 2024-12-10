@@ -26,7 +26,6 @@ def is_maxwell_boltzmann(speeds: np.ndarray, m: float, T: float) -> bool:
     return p_value < cutoff
 
 
-@pytest.fixture
 def test_maxwell_boltzmann_distribution() -> None:
     """
     Checks if the speed distribution from the MB_dist simulation is sampled from a Maxwell_Boltzmann distribution. 
