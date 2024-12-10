@@ -4,6 +4,13 @@ import pytest
 import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.MB_dist import get_speeds, get_KE, MDSimulation, Histogram
+from species_and_particle import Species, Particle
+
+X, Y = 0, 1
+
+@pytest.fixture
+def species_A():
+    return Species(name="A", mass=1.0, radius=0.01, color="red")
 
 # Testing the get_speeds function
 @pytest.mark.parametrize(
