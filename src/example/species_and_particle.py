@@ -1,5 +1,8 @@
+import numpy as np
+
 class Species: 
     #defines each species to have common attributes: name, mass, radius, color
+    
     def __init__(self, name, mass, radius, color):
         self.name = name
         self.mass = mass
@@ -8,7 +11,8 @@ class Species:
 
 class Particle: 
     #defines a particle which is an instance of a species
-    def __init__(self, species, pos, vel)
+    
+    def __init__(self, species, pos, vel):
     self.species = species 
     self.pos = np.array(pos, dtype = float)
     self.vel = np.array(vel, dtype = float)
