@@ -12,7 +12,7 @@ class Particle:
     self.pos = np.array(pos, dtype = float)
     self.vel = np.array(vel, dtype = float)
 
-    @property 
+    @property
     def mass(self):
         return self.species.mass
 
