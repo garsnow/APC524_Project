@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 from md_simulation import MDSimulation, get_speeds
 
 cutoff = 0.05
