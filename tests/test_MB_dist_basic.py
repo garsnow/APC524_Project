@@ -188,8 +188,8 @@ def test_MDSimulation_boundary_reflection(simulation, species_A, species_B):
     dt = 0.1
     sim.advance(dt)
     
-    expected_pos_p1 = np.array([0.05, 0.5])  # Should be set back to radius
-    expected_pos_p2 = np.array([0.95, 0.5])  # Should be set back to 1 - radius
+    expected_pos_p1 = np.array([p1.radius, 0.5])  # Should be set back to radius
+    expected_pos_p2 = np.array([1 - p2.radius, 0.5])  # Should be set back to 1 - radius
     expected_vel_p1 = np.array([1.0, 0.0])   # Reversed
     expected_vel_p2 = np.array([-1.0, 0.0])  # Reversed
     
