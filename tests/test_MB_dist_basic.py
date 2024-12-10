@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.MB_dist import get_speeds, get_KE, MDSimulation, Histogram
-from .species_and_particle import Species, Particle
+from species_and_particle import Species, Particle
 
 X, Y = 0, 1
 
@@ -120,7 +120,7 @@ def test_MDSimulation_init(particle_A, particle_B):
 
 # Testing MDsimulation.advance
 # with collision
-def test_MDSimulation_advance():
+def test_MDSimulation_advance_with_collision():
     p1, p2 = simulation.particles
 
     pos_before = p1.pos.copy()
@@ -157,7 +157,7 @@ def test_MDSimulation_advance():
     assert simulation.nsteps == 1
 
 # MDsimulation without collision
-def test_MDSimulation_advance():
+def test_MDSimulation_advance_without_collision():
     p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
     
