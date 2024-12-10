@@ -1,6 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 
-
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
@@ -117,7 +118,7 @@ def get_speeds(vel):
 
 def get_KE(m, speeds):
     """Return the total kinetic energy of all particles in scaled units."""
-    return 0.5 * m * sum(speeds**2)
+    return 0.5 * m * np.sum(speeds**2)
 
 
 def particle_simulator(number_of_particles,time_step,particle_mass):
@@ -212,7 +213,7 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     
     def animate(i):
         """Advance the animation by one step and update the frame."""
-        global sim, verts, mb_est_line, mb_est
+        nonlocal mb_est
         sim.advance(dt)
     
         particles.set_data(sim.pos[:, X], sim.pos[:, Y])
@@ -240,5 +241,5 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     anim = FuncAnimation(
             fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
             )
-    anim.save("MB_simulation.gif", writer="Pillow")
+    anim.save("MB_simulation.gif", writer="pillow")
     plt.show()
