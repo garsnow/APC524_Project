@@ -1,6 +1,5 @@
 import MB_dist
 
-caller(1000,30,1)
 
 def caller(number_of_particles, FPS, particle_mass):
     '''
@@ -13,3 +12,4 @@ def caller(number_of_particles, FPS, particle_mass):
     '''
     MB_dist.particle_simulator(number_of_particles, FPS, particle_mass)
 
+caller(1000,30,1)
