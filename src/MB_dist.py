@@ -8,58 +8,76 @@ from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
 
+#imports classes needed
+from species_and_particle import Species, Particle
+
 X, Y = 0, 1
 
 class MDSimulation:
 
-    def __init__(self, pos, vel, r, m):
+    def __init__(self, particles):
         """
-        Initialize the simulation with identical, circular particles of radius
-        r and mass m. The n x 2 state arrays pos and vel hold the n particles'
-        positions in their rows as (x_i, y_i) and (vx_i, vy_i).
+        Initialize the simulation with A & B identical, circular particles of radius
+        r and mass m.
 
         """
-
-        self.pos = np.asarray(pos, dtype=float)
-        self.vel = np.asarray(vel, dtype=float)
-        self.n = self.pos.shape[0]
-        self.r = r
-        self.m = m
+        self.particles = particles
+        self.n = len(particles)
         self.nsteps = 0
 
     def advance(self, dt):
-        """Advance the simulation by dt seconds."""
+            self.nsteps += 1
+            # Update positions
+            for p in self.particles:
+                p.pos += p.vel * dt
 
-        self.nsteps += 1
-        # Update the particles' positions according to their velocities.
-        self.pos += self.vel * dt
-        # Find indices for all unique collisions.
-        dist = squareform(pdist(self.pos))
-        # Definition for hard sphere collisions
-        iarr, jarr = np.where(dist < 2 * self.r)
-        k = iarr < jarr
-        iarr, jarr = iarr[k], jarr[k]
+            # Compute distances between all pairs
+            pos_array = np.array([p.pos for p in self.particles])
+            dist = squareform(pdist(pos_array))
+            # sum of radii for each pair
+            radii = np.array([p.radius for p in self.particles])
+            sum_r = np.add.outer(radii, radii)
 
-        # For each collision (perfect elastic), update the velocities of the particles involved. 
-        for i, j in zip(iarr, jarr):
-            pos_i, vel_i = self.pos[i], self.vel[i]
-            pos_j, vel_j = self.pos[j], self.vel[j]
-            rel_pos, rel_vel = pos_i - pos_j, vel_i - vel_j
-            r_rel = rel_pos @ rel_pos
-            v_rel = rel_vel @ rel_pos
-            v_rel = 2 * rel_pos * v_rel / r_rel - rel_vel
-            v_cm = (vel_i + vel_j) / 2
-            self.vel[i] = v_cm - v_rel / 2
-            self.vel[j] = v_cm + v_rel / 2
+            # Identify collisions (dist < sum of radii and not zero)
+            iarr, jarr = np.where((dist < sum_r) & (dist > 0))
+            k = iarr < jarr
+            iarr, jarr = iarr[k], jarr[k]
 
-        # Bounce the particles off the walls where necessary, by reflecting
-        # their velocity vectors.
-        hit_left_wall = self.pos[:, X] < self.r
-        hit_right_wall = self.pos[:, X] > 1 - self.r
-        hit_bottom_wall = self.pos[:, Y] < self.r
-        hit_top_wall = self.pos[:, Y] > 1 - self.r
-        self.vel[hit_left_wall | hit_right_wall, X] *= -1
-        self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
+            # Resolve particle collisions
+            for i, j in zip(iarr, jarr):
+                self.resolve_collision(self.particles[i], self.particles[j])
+
+            # Wall collisions
+            for p in self.particles:
+                # Left wall
+                if p.pos[X] < p.radius:
+                    p.pos[X] = p.radius
+                    p.vel[X] *= -1
+                # Right wall
+                elif p.pos[X] > 1 - p.radius:
+                    p.pos[X] = 1 - p.radius
+                    p.vel[X] *= -1
+
+                # Bottom wall
+                if p.pos[Y] < p.radius:
+                    p.pos[Y] = p.radius
+                    p.vel[Y] *= -1
+                # Top wall
+                elif p.pos[Y] > 1 - p.radius:
+                    p.pos[Y] = 1 - p.radius
+                    p.vel[Y] *= -1
+
+    def resolve_collision(self, p1, p2):
+        # Two-body elastic collision
+        m1, m2 = p1.mass, p2.mass
+        r12 = p1.pos - p2.pos
+        v12 = p1.vel - p2.vel
+        r12_sq = np.dot(r12, r12)
+        # Project v12 onto r12
+        factor = np.dot(v12, r12) / r12_sq
+
+        p1.vel = p1.vel - (2*m2/(m1+m2))*factor*r12
+        p2.vel = p2.vel + (2*m1/(m1+m2))*factor*r12
         
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
@@ -110,8 +128,9 @@ class Histogram:
 
 
 
-def get_speeds(vel):
+def get_speeds(particles):
     """Return the magnitude of the (n,2) array of velocities, vel."""
+    vel = np.array([p.vel for p in particles])
     return np.hypot(vel[:, X], vel[:, Y])
 
 
@@ -120,78 +139,69 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(number_of_particles,time_step,particle_mass):
+def particle_simulator(num_A, num_B,time_step):
+    # Define two species with different properties
+    species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
+    species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
 
+    # Create initial positions and velocities for each species
+    # For simplicity, place species A on the left side, species B on the right
+    pos_A = np.random.rand(num_A, 2) * 0.4 + 0.05  # left side
+    vel_A = (np.random.rand(num_A, 2) - 0.5)
 
-    # Number of particles.
-    n = number_of_particles
-    # Scaling factor for distance, m-1. The box dimension is therefore 1/rscale.
-    rscale = 5.0e6
-    # Use the van der Waals radius of Ar, about 0.2 nm.
-    r = 2e-10 * rscale
+    pos_B = np.random.rand(num_B, 2) * 0.4 + 0.55  # right side
+    vel_B = (np.random.rand(num_B, 2) - 0.5)
 
-    # Scale time by this factor, in s-1. (nanoseconds)
-    tscale = 1e9  
+    particles = [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)] + \
+                [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
 
-    # Take the mean speed to be the root-mean-square velocity of Ar at 300 K.
-    sbar = 353 * rscale / tscale
-    # Time step in scaled time units.
+    sim = MDSimulation(particles)
+
     FPS = time_step
     dt = 1 / FPS
-    # Particle masses, scaled by some factor we're not using yet.
-    m = particle_mass
-    
-    # Initialize the particles' positions randomly.
-    pos = np.random.random((n, 2))
-    # Initialize the particles velocities with random orientations and random
-    # magnitudes  around the mean speed, sbar.
-    theta = np.random.random(n) * 2 * np.pi
-    s0 = sbar * np.random.random(n)
-    vel = (s0 * np.array((np.cos(theta), np.sin(theta)))).T
-    
-    sim = MDSimulation(pos, vel, r, m)
-    
-    # Set up the Figure and make some adjustments to improve its appearance.
-    DPI = 100
-    width, height = 1000, 500
-    fig = plt.figure(figsize=(width / DPI, height / DPI), dpi=DPI)
-    fig.subplots_adjust(left=0, right=0.97)
-    sim_ax = fig.add_subplot(121, aspect="equal", autoscale_on=False)
-    sim_ax.set_xticks([])
-    sim_ax.set_yticks([])
-    # Make the box walls a bit more substantial.
-    for spine in sim_ax.spines.values():
-        spine.set_linewidth(2)
-    
-    speed_ax = fig.add_subplot(122)
-    speed_ax.set_xlabel("v [m/s]")
-    speed_ax.set_ylabel("pdf(v)")
-    
-    (particles,) = sim_ax.plot([], [], "ko")
-    
-    speeds = get_speeds(sim.vel)
-    speed_hist = Histogram(speeds, 2 * sbar, 50, density=True)
-    speed_hist.draw(speed_ax)
-    speed_ax.set_xlim(speed_hist.left[0], speed_hist.right[-1])
-    # TODO don't hardcode the upper limit for the histogram speed axis.
-    ticks = np.linspace(0, 600, 7, dtype=int)
-    speed_ax.set_xticks(ticks * rscale / tscale)
-    speed_ax.set_xticklabels([str(tick) for tick in ticks])
-    speed_ax.set_yticks([])
-    
-    fig.tight_layout()
-    
+
+    # Set up plotting
+    fig, ax = plt.subplots(figsize=(6,6))
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect('equal', 'box')
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # We'll use a scatter plot so we can easily set individual particle colors
+    x = [p.pos[X] for p in sim.particles]
+    y = [p.pos[Y] for p in sim.particles]
+    colors = [p.color for p in sim.particles]
+    scatter = ax.scatter(x, y, c=colors, s=30)
+
+    #label = ax.text(0.05, 0.95, "", transform=ax.transAxes, va='top', backgroundcolor='white')
+
     # The 2D Maxwell-Boltzmann equilibrium distribution of speeds.
 
-    mean_KE = get_KE(m, speeds) / n
-    a = sim.m / 2 / mean_KE
+    #caclulates an average mass for the two particles
+    masses = [p.mass for p in sim.particles]
+    m = np.mean(masses)
+
+    #computes speeds from particles
+    speeds = get_speeds(sim.particles)
+    
+    mean_KE = get_KE(m, speeds) / sim.n
+    a = m / 2 / mean_KE
+
+    #speed subplot
+    speed_ax = fig.add_subplot(122)
+    speed_hist = Histogram(speeds, xmax=np.max(speeds)*2, nbars=50, density=True)
+    speed_hist.draw(speed_ax)
+
+    
     # Use a high-resolution grid of speed points so that the exact distribution
     # looks smooth.
     sgrid_hi = np.linspace(0, speed_hist.bins[-1], 200)
     f = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
     (mb_line,) = speed_ax.plot(sgrid_hi, f, c="0.7")
+    
     # Maximum value of the 2D Maxwell-Boltzmann speed distribution.
-    fmax = np.sqrt(sim.m / mean_KE / np.e)
+    fmax = np.sqrt( m / mean_KE / np.e)
     speed_ax.set_ylim(0, fmax)
     
     # For the distribution derived by averaging, take the abcissa speed points from
@@ -209,21 +219,22 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     
     def init_anim():
         """Initialize the animation"""
-        particles.set_data([], [])
-    
-        return particles, speed_hist.patch, mb_est_line, label
+        scatter.set_offsets(np.zeros((0, 2)))
+        return scatter, label
     
     
     def animate(i):
         """Advance the animation by one step and update the frame."""
-
+        
         nonlocal mb_est
         sim.advance(dt)
     
-        particles.set_data(sim.pos[:, X], sim.pos[:, Y])
-        particles.set_markersize(0.5)
+        x = [p.pos[X] for p in sim.particles]
+        y = [p.pos[Y] for p in sim.particles]
+        scatter.set_offsets(np.column_stack((x, y)))
+        #scatter.set_sizes([30]*sim.n)
     
-        speeds = get_speeds(sim.vel)
+        speeds = get_speeds(sim.particles)
         speed_hist.update(speeds)
     
         # Once the simulation has approached equilibrium a bit, start averaging
@@ -235,7 +246,7 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
     
         label.set_text(f"$t$ = {i * dt:.1f} ns, step = {i:d}")
     
-        return particles, speed_hist.patch, mb_est_line, label
+        return scatter, speed_hist.patch, mb_est_line, label
     
     
     # Only start averaging the speed distribution after frame number IAV_ST.
@@ -246,5 +257,5 @@ def particle_simulator(number_of_particles,time_step,particle_mass):
             fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
             )
 
-    anim.save("MB_simulation.gif", writer="pillow")
+    anim.save("MB_simulation.gif", writer="Pillow")
     plt.show()
