@@ -12,166 +12,190 @@ X, Y = 0, 1
 def species_A():
     return Species(name="A", mass=1.0, radius=0.01, color="red")
 
+@pytest.fixture
+def species_B():
+    return Species(name="B", mass=2.0, radius=0.02, color="blue")
+
+@pytest.fixture
+def species_C():
+    return Species(name="C", mass=3.0, radius=0.03, color='purple')
+
+@pytest.fixture
+def particle_A(species_A):
+    pos = np.array([0.1, 0.1])
+    vel = np.array([1.0, 0.0])
+    return Particle(species_A, pos, vel)
+
+@pytest.fixture
+def particle_B(species_B):
+    pos = np.array([0.9, 0.9])
+    vel = np.array([-1.0, 0.0])
+    return Particle(species_B, pos, vel)
+
+@pytest.fixture
+def particle_C(species_C):
+    pos = np.array([0.5, 0.5])
+    vel = np.array([0.0, 0.0])
+    return Particle(species_C, pos, vel)
+
+@pytest.fixture
+def simulation(particle_A, particle_B):
+    particles = [particle_A, particle_B]
+    return MDSimulation(particles)
+
 # Testing the get_speeds function
 @pytest.mark.parametrize(
-    "vel, expected_speeds",
+    "particles, expected_speeds",
     [
-            # basic positive vel
-            (
-                np.array([
-                    [3.0, 4.0],
-                    [0.0, 0.0],
-                    [1.0, 1.0],
-                ]),
-                np.array([5.0, 0.0, np.sqrt(2)])
-            ),
-            # mixed neg, pos, zero velocities
-            (
-                np.array([
-                    [-3.0, -4.0],
-                    [0.0, -2.0],
-                    [3.0, -1.0],
-                ]),
-                np.array([5.0, 2.0, np.sqrt(10)])
-            ),
-            # zero velocities
-            (
-                np.array([
-                    [0.0, 0.0]
-                ]),
-                np.array([0.0])
-            ),
-            # large and small velocities
-            (
-                np.array([
-                    [1e6, 1e6],
-                    [1e-10, 1e-10],
-                ]),
-                np.array([np.sqrt(2)*1e6, np.sqrt(2)*1e-10])
-            ),
+        # Basic positive velocities
+        (
+            [
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.2, 0.2]), np.array([3.0, 4.0])),
+                Particle(Species("B", 2.0, 0.02, "blue"), np.array([0.3, 0.3]), np.array([0.0, 0.0])),
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.4, 0.4]), np.array([1.0, 1.0])),
+            ],
+            np.array([5.0, 0.0, np.sqrt(2)])
+        ),
+        # Mixed negative, positive, zero velocities
+        (
+            [
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.2, 0.2]), np.array([-3.0, -4.0])),
+                Particle(Species("B", 2.0, 0.02, "blue"), np.array([0.3, 0.3]), np.array([0.0, -2.0])),
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.4, 0.4]), np.array([3.0, -1.0])),
+            ],
+            np.array([5.0, 2.0, np.sqrt(10)])
+        ),
+        # Zero velocities
+        (
+            [
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.2, 0.2]), np.array([0.0, 0.0]))
+            ],
+            np.array([0.0])
+        ),
+        # Large and small velocities
+        (
+            [
+                Particle(Species("A", 1.0, 0.01, "red"), np.array([0.2, 0.2]), np.array([1e6, 1e6])),
+                Particle(Species("B", 2.0, 0.02, "blue"), np.array([0.3, 0.3]), np.array([1e-10, 1e-10])),
+            ],
+            np.array([np.sqrt(2)*1e6, np.sqrt(2)*1e-10])
+        ),
     ]
 )
-def test_get_speeds(vel, expected_speeds):
-    computed_speeds = get_speeds(vel)
+def test_get_speeds(particles, expected_speeds):
+    computed_speeds = get_speeds(particles)
     np.testing.assert_array_almost_equal(computed_speeds, expected_speeds)
 
-# Test with an empty array
+# Test with an empty list of particles
 def test_get_speeds_empty():
-    vel = np.array([]).reshape(0, 2)
+    particles = []
     expected_speeds = np.array([])
                     
-    computed_speeds = get_speeds(vel)
+    computed_speeds = get_speeds(particles)
     np.testing.assert_array_equal(computed_speeds, expected_speeds)
 
 # Testing the get_KE function
 def test_get_KE():
-    m = 2.0
-    speeds = np.array([3.0, 4.0])
-    expected_ke = 0.5 * m * (3.0**2 + 4.0**2)
+    species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
+    species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
+    
+    particle_A = Particle(species_A, np.array([0.1, 0.1]), np.array([3.0, 4.0]))
+    particle_B = Particle(species_B, np.array([0.9, 0.9]), np.array([0.0, 0.0]))
+    
+    speeds = get_speeds([particle_A, particle_B])
+    m = 2.0  # Average mass or specific mass as per your simulation logic
+    expected_ke = 0.5 * m * np.sum(speeds**2)
     computed_ke = get_KE(m, speeds)
     assert computed_ke == expected_ke
 
 # Testing MDSimulation Class
-def test_MDSImulation_init():
-    pos = np.array([
-        [0.1, 0.1],
-        [0.9, 0.9]
-    ])
-    vel = np.array([
-        [1.0, 0.0],
-        [0.0, -1.0]
-    ])
-    r = 0.05 
-    m = 1.0
+def test_MDSimulation_init(particle_A, particle_B):
+    sim = MDSimulation([particle_A, particle_B])
 
-    sim = MDSimulation(pos, vel, r, m)
-
-    assert np.array_equal(sim.pos, pos)
-    assert np.array_equal(sim.vel, vel)
     assert sim.n == 2
-    assert sim.r == r
-    assert sim.m == m
+    assert sim.r == particle_A.radius  # Assuming all particles have the same radius
+    assert sim.m == particle_A.mass  # Assuming all particles have the same mass
     assert sim.nsteps == 0
+    assert sim.particles == [particle_A, particle_B]
 
 # Testing MDsimulation.advance
 # with collision
 def test_MDSimulation_advance():
-    pos = np.array([
-        [0.4, 0.5],
-        [0.6, 0.5]
-    ])
-    vel = np.array([
-        [1.0, 0.0],
-        [-1.0, 0.0]
-    ])
-    r = 0.05
-    m = 1.0
+    p1, p2 = simulation.particles
 
-    sim = MDSimulation(pos, vel, r, m)
+    pos_before = p1.pos.copy()
+    vel_before = p1.vel.copy()
+    pos_before_p2 = p2.pos.copy()
+    vel_before_p2 = p2.vel.copy()
+
+     # Advance the simulation
     dt = 0.1
+    simulation.advance(dt)
 
-    sim.advance(dt)
-    expected_pos = pos + vel * dt
+    expected_pos_p1 = pos_before + vel_before * dt
+    expected_pos_p2 = pos_before_p2 + vel_before_p2 * dt
+    np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+    np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
 
-    expected_vel = np.array([
-        [-1.0, 0.0],
-        [1.0, 0.0]
-    ])
+    # Manual calculation for elastic collision
+    m1, m2 = p1.mass, p2.mass
+    v1_initial = vel_before
+    v2_initial = vel_before_p2
+    r12 = expected_pos_p1 - expected_pos_p2
+    v_rel = v1_initial - v2_initial
+    distance_sq = np.dot(r12, r12)
+    if distance_sq == 0:
+        distance_sq = 1e-10  # Avoid division by zero
 
-    np.testing.assert_array_almost_equal(sim.pos, expected_pos)
-    np.testing.assert_array_almost_equal(sim.vel, expected_vel)
-    assert sim.nsteps == 1
+    factor = np.dot(v_rel, r12) / distance_sq
 
-# without collision
+    expected_vel_p1 = v1_initial - (2 * m2 / (m1 + m2)) * factor * r12
+    expected_vel_p2 = v2_initial + (2 * m1 / (m1 + m2)) * factor * r12
+
+    np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
+    np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
+    assert simulation.nsteps == 1
+
+# MDsimulation without collision
 def test_MDSimulation_advance():
-    pos = np.array([
-        [0.1, 0.1],
-        [0.9, 0.9]
-    ])
-    vel = np.array([
-        [1.0, 0.0],
-        [0.0, 1.0]
-    ])
-    r = 0.05
-    m = 1.0
-
-    sim = MDSimulation(pos, vel, r, m)
+    p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
+    p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
+    
+    sim = MDSimulation([p1, p2])
     dt = 0.1
-
     sim.advance(dt)
-    expected_pos = pos + vel * dt
-    expected_vel = vel.copy()
-
-    np.testing.assert_array_almost_equal(sim.pos, expected_pos)
-    np.testing.assert_array_almost_equal(sim.vel, expected_vel)
+    
+    expected_pos_p1 = np.array([0.3, 0.2])
+    expected_pos_p2 = np.array([0.8, 0.9])
+    
+    np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+    np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
+    # Velocities should remain unchanged
+    np.testing.assert_array_almost_equal(p1.vel, np.array([1.0, 0.0]))
+    np.testing.assert_array_almost_equal(p2.vel, np.array([0.0, 1.0]))
+    
     assert sim.nsteps == 1
 
 #collision with wall (MDSimulation boundary reflection)
 def test_MDSimulation_boundary_reflection():
-    pos = np.array([
-        [0.05, 0.5],
-        [0.95, 0.5]
-    ])
-    vel = np.array([
-        [-1.0, 0.0],
-        [1.0, 0.0]
-    ])
-
-    r = 0.05
-    m = 1.0
-
-    sim = MDSimulation(pos, vel, r, m)
+    # Create particles positioned to collide with walls
+    p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
+    p2 = Particle(species_B, np.array([0.95, 0.5]), np.array([1.0, 0.0]))   # Right wall
+    
+    sim = MDSimulation([p1, p2])
     dt = 0.1
-
     sim.advance(dt)
-    expected_pos = pos + vel * dt
-    expected_vel = np.array([
-        [1.0, 0.0],
-        [-1.0, 0.0]
-    ])
-
-    np.testing.assert_array_almost_equal(sim.pos, expected_pos)
-    np.testing.assert_array_almost_equal(sim.vel, expected_vel)
+    
+    expected_pos_p1 = np.array([0.05, 0.5])  # Should be set back to radius
+    expected_pos_p2 = np.array([0.95, 0.5])  # Should be set back to 1 - radius
+    expected_vel_p1 = np.array([1.0, 0.0])   # Reversed
+    expected_vel_p2 = np.array([-1.0, 0.0])  # Reversed
+    
+    np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+    np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
+    np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
+    np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
+    
     assert sim.nsteps == 1
 
 # Testing Histogram class initilization
