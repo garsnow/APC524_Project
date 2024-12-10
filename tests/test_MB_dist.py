@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.stats import kstest
 
-from MD_dist import MDSimulation, get_speeds, particle_simulator
+from MB_dist import MDSimulation, get_speeds, particle_simulator
 
 cutoff = 0.05
 
