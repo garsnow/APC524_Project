@@ -24,8 +24,8 @@ tests/test_MB_dist_basic.py::test_MDSimulation_reaction PASSED           [100%]
 =================================== FAILURES ===================================
 ___________________ test_MDSimulation_advance_with_collision ___________________
 
-simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f309ea4a6e0>
-species_A = <src.species_and_particle.Species object at 0x7f309ea4ab30>
+simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f28e26de6e0>
+species_A = <src.species_and_particle.Species object at 0x7f28e26deb30>
 
     def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
         p1, p2 = simulation_elastic.particles
@@ -46,12 +46,12 @@ species_A = <src.species_and_particle.Species object at 0x7f309ea4ab30>
 dt         = 0.1
 expected_pos_p1 = array([0.3, 0.5])
 expected_pos_p2 = array([0.7, 0.5])
-p1         = <src.species_and_particle.Particle object at 0x7f309ea4ab00>
-p2         = <src.species_and_particle.Particle object at 0x7f309ea4a7d0>
+p1         = <src.species_and_particle.Particle object at 0x7f28e26deb00>
+p2         = <src.species_and_particle.Particle object at 0x7f28e26de7d0>
 pos_before = array([0.2, 0.5])
 pos_before_p2 = array([0.8, 0.5])
-simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f309ea4a6e0>
-species_A  = <src.species_and_particle.Species object at 0x7f309ea4ab30>
+simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f28e26de6e0>
+species_A  = <src.species_and_particle.Species object at 0x7f28e26deb30>
 vel_before = array([1., 0.])
 vel_before_p2 = array([-1.,  0.])
 
@@ -91,7 +91,7 @@ E        DESIRED: array([0.3, 0.5])
 
 args       = (array([0.5, 0.5]), array([0.3, 0.5]))
 dep_version = '2.0.0'
-fun        = <function assert_array_almost_equal at 0x7f30b98c8940>
+fun        = <function assert_array_almost_equal at 0x7f28fd5288b0>
 kwargs     = {}
 new_name   = 'desired'
 new_names  = ['actual', 'desired']
@@ -101,4 +101,4 @@ old_names  = ['x', 'y']
 ../../../.local/lib/python3.10/site-packages/numpy/_utils/__init__.py:85: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision
-========================= 1 failed, 12 passed in 0.92s =========================
+========================= 1 failed, 12 passed in 1.14s =========================
