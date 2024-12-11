@@ -52,7 +52,8 @@ def particle_C(species_C):
 @pytest.fixture
 def simulation(particle_A, particle_B):
     particles = [particle_A, particle_B]
-    return MDSimulation(particles)
+    reaction_probability = 0.0
+    return MDSimulation(particles, reaction_probability)
 
 
 @pytest.fixture
@@ -60,7 +61,8 @@ def simulation_reaction(species_A, species_B):
     # Create two particles positioned to collide after dt=0.1
     p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
-    return MDSimulation([p1, p2])
+    reaction_probability = 1.0 # always react
+    return MDSimulation([p1, p2], reaction_probability)
 
 
 @pytest.fixture
@@ -68,7 +70,8 @@ def simulation_elastic(species_A):
     # Create two particles of the same species to test elastic collision
     p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
     p2 = Particle(species_A, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
-    return MDSimulation([p1, p2])
+    reaction_probability = 0.0 # no reaction
+    return MDSimulation([p1, p2], reaction_probability)
 
 
 # Testing the get_speeds function
@@ -177,11 +180,14 @@ def test_get_KE():
 
 # Testing MDSimulation Class
 def test_MDSimulation_init(particle_A, particle_B):
-    sim = MDSimulation([particle_A, particle_B])
+    reaction_probability = 0.0
+    sim = MDSimulation([particle_A, particle_B], reaction_probability)
 
     assert sim.n == 2
     assert sim.nsteps == 0
     assert sim.particles == [particle_A, particle_B]
+    assert sim.reaction_probability == reaction_probability
+    assert sim.reactions == []
 
 
 # Testing MDsimulation.advance
@@ -215,8 +221,9 @@ def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
 def test_MDSimulation_advance_without_collision(simulation, species_A, species_B):
     p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
-
-    sim = MDSimulation([p1, p2])
+    
+    reaction_probability = 0.0
+    sim = MDSimulation([p1, p2], reaction_probability)
     dt = 0.1
     sim.advance(dt)
 
@@ -233,12 +240,13 @@ def test_MDSimulation_advance_without_collision(simulation, species_A, species_B
 
 
 # collision with wall (MDSimulation boundary reflection)
-def test_MDSimulation_boundary_reflection(simulation, species_A, species_B):
+def test_MDSimulation_boundary_reflection(species_A, species_B):
     # Create particles positioned to collide with walls
     p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
     p2 = Particle(species_B, np.array([0.95, 0.5]), np.array([1.0, 0.0]))  # Right wall
 
-    sim = MDSimulation([p1, p2])
+    reaction_probability = 0.0
+    sim = MDSimulation([p1, p2], reaction_probability)
     dt = 0.1
     sim.advance(dt)
 
@@ -291,6 +299,8 @@ def test_Histogram_update():
 
 
 def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, species_C):
+    initial_num_particles = len(simulation_reaction.particles)
+    assert initial_num_particles == 2  # Two particles before reaction
     p1, p2 = simulation_reaction.particles
 
     # Advance the simulation
@@ -298,8 +308,8 @@ def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, specie
     simulation_reaction.advance(dt)
 
     # After advance, particles should have reacted to form a new C particle
-    assert len(simulation_reaction.particles) == 1  # Only species C remains
-    new_p = simulation_reaction.particles[0]
+    assert len(simulation_reaction.particles) == initial_num_particles - 2 + 1  # Remove 2, add 1
+    new_p = simulation_reaction.particles[-1]
     assert new_p.species.name == "C"
     expected_pos = 0.5 * (p1.pos + p2.pos)
     expected_vel = (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
