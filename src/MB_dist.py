@@ -1,6 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import matplotlib
-matplotlib.use('TkAgg')
+
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
@@ -9,22 +10,24 @@ from scipy.spatial.distance import pdist, squareform
 
 X, Y = 0, 1
 
-class Species: 
-    #defines each species to have common attributes: name, mass, radius, color
-    
+
+class Species:
+    # defines each species to have common attributes: name, mass, radius, color
+
     def __init__(self, name, mass, radius, color):
         self.name = name
         self.mass = mass
         self.radius = radius
         self.color = color
 
-class Particle: 
-    #defines a particle which is an instance of a species
-    
+
+class Particle:
+    # defines a particle which is an instance of a species
+
     def __init__(self, species, pos, vel):
-        self.species = species 
-        self.pos = np.array(pos, dtype = float)
-        self.vel = np.array(vel, dtype = float)
+        self.species = species
+        self.pos = np.array(pos, dtype=float)
+        self.vel = np.array(vel, dtype=float)
 
     @property
     def mass(self):
@@ -38,8 +41,8 @@ class Particle:
     def color(self):
         return self.species.color
 
-class MDSimulation:
 
+class MDSimulation:
     def __init__(self, particles):
         """
         Initialize the simulation with A & B identical, circular particles of radius
@@ -52,83 +55,85 @@ class MDSimulation:
         self.reactions = []
 
     def advance(self, dt):
-            self.nsteps += 1
-            # Update positions
-            for p in self.particles:
-                p.pos += p.vel * dt
+        self.nsteps += 1
+        # Update positions
+        for p in self.particles:
+            p.pos += p.vel * dt
 
-            # Compute distances between all pairs
-            pos_array = np.array([p.pos for p in self.particles])
-            dist_matrix = squareform(pdist(pos_array))
-            
-            # Prevent self collsions by setting diagonal to infinity
-            np.fill_diagonal(dist_matrix, np.inf)
+        # Compute distances between all pairs
+        pos_array = np.array([p.pos for p in self.particles])
+        dist_matrix = squareform(pdist(pos_array))
 
-            # sum of radii for each pair
-            radii = np.array([p.radius for p in self.particles])
-            sum_r = np.add.outer(radii, radii)
+        # Prevent self collsions by setting diagonal to infinity
+        np.fill_diagonal(dist_matrix, np.inf)
 
-            # Identify collisions (dist <= sum of radii and not zero)
-            iarr, jarr = np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
-            k = iarr < jarr
-            iarr, jarr = iarr[k], jarr[k]
+        # sum of radii for each pair
+        radii = np.array([p.radius for p in self.particles])
+        sum_r = np.add.outer(radii, radii)
 
-            # Resolve particle collisions
-            for i, j in zip(iarr, jarr):
-                self.resolve_collision(self.particles[i], self.particles[j])
+        # Identify collisions (dist <= sum of radii and not zero)
+        iarr, jarr = np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
+        k = iarr < jarr
+        iarr, jarr = iarr[k], jarr[k]
 
-            #delete A,B and add C to particles list
-            if self.reactions:
-                for (p1, p2, new_p) in self.reactions:
-                    if p1 in self.particles:
-                        self.particles.remove(p1)
-                    if p2 in self.particles:
-                        self.particles.remove(p2)
-                    self.particles.append(new_p)
-                self.reactions.clear()
+        # Resolve particle collisions
+        for i, j in zip(iarr, jarr):
+            self.resolve_collision(self.particles[i], self.particles[j])
 
-            # Wall collisions
-            for p in self.particles:
-                # Left wall
-                if p.pos[X] < p.radius:
-                    p.pos[X] = p.radius
-                    p.vel[X] *= -1
-                # Right wall
-                elif p.pos[X] > 1 - p.radius:
-                    p.pos[X] = 1 - p.radius
-                    p.vel[X] *= -1
+        # delete A,B and add C to particles list
+        if self.reactions:
+            for p1, p2, new_p in self.reactions:
+                if p1 in self.particles:
+                    self.particles.remove(p1)
+                if p2 in self.particles:
+                    self.particles.remove(p2)
+                self.particles.append(new_p)
+            self.reactions.clear()
 
-                # Bottom wall
-                if p.pos[Y] < p.radius:
-                    p.pos[Y] = p.radius
-                    p.vel[Y] *= -1
-                # Top wall
-                elif p.pos[Y] > 1 - p.radius:
-                    p.pos[Y] = 1 - p.radius
-                    p.vel[Y] *= -1
-    
+        # Wall collisions
+        for p in self.particles:
+            # Left wall
+            if p.pos[X] < p.radius:
+                p.pos[X] = p.radius
+                p.vel[X] *= -1
+            # Right wall
+            elif p.pos[X] > 1 - p.radius:
+                p.pos[X] = 1 - p.radius
+                p.vel[X] *= -1
+
+            # Bottom wall
+            if p.pos[Y] < p.radius:
+                p.pos[Y] = p.radius
+                p.vel[Y] *= -1
+            # Top wall
+            elif p.pos[Y] > 1 - p.radius:
+                p.pos[Y] = 1 - p.radius
+                p.vel[Y] *= -1
+
     # treats particle collision as elastic
     def resolve_collision(self, p1, p2):
-        #if collision between A&B --> C
-        if (p1.species.name == "A" and p2.species.name == "B") or (p1.species.name == "B" and p2.species.name == "A"):
-            new_pos = .5 * (p1.pos + p2.pos)
+        # if collision between A&B --> C
+        if (p1.species.name == "A" and p2.species.name == "B") or (
+            p1.species.name == "B" and p2.species.name == "A"
+        ):
+            new_pos = 0.5 * (p1.pos + p2.pos)
             m1, m2 = p1.mass, p2.mass
             total_mass = m1 + m2
             new_vel = (m1 * p1.vel + m2 * p2.vel) / total_mass
-        
-            species_C = Species(name="C", mass=3.0, radius=0.03, color='purple') 
+
+            species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
             new_particle = Particle(species_C, new_pos, new_vel)
 
-            # remove A + B and add C to particles list 
+            # remove A + B and add C to particles list
             self.reactions.append((p1, p2, new_particle))
 
-        #otherwise elastic collision
-        else: 
+        # otherwise elastic collision
+        else:
             m1, m2 = p1.mass, p2.mass
             r12 = p1.pos - p2.pos
             v12 = p1.vel - p2.vel
             r12_sq = np.dot(r12, r12)
-            
+
             if r12_sq == 0:
                 separation = p1.radius * 1e-3
                 p1.pos[X] += separation
@@ -137,9 +142,10 @@ class MDSimulation:
                 r12_sq = np.dot(r12, r12)
 
             v_rel = np.dot(v12, r12) / r12_sq
-    
-            p1.vel = p1.vel - (2 * m2 / ( m1 + m2 )) * v_rel * r12
-            p2.vel = p2.vel + (2 * m1 / ( m1 + m2 )) * v_rel * r12
+
+            p1.vel = p1.vel - (2 * m2 / (m1 + m2)) * v_rel * r12
+            p2.vel = p2.vel + (2 * m1 / (m1 + m2)) * v_rel * r12
+
 
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
@@ -177,8 +183,8 @@ class Histogram:
         codes[4::5] = path.Path.CLOSEPOLY
         barpath = path.Path(self.verts, codes)
         self.patch = patches.PathPatch(
-                barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
-                )
+            barpath, fc="tab:green", ec="k", lw=0.5, alpha=0.5
+        )
         ax.add_patch(self.patch)
 
     def update(self, data):
@@ -187,7 +193,6 @@ class Histogram:
         self.top = self.bottom + self.hist
         self.verts[1::5, 1] = self.top
         self.verts[2::5, 1] = self.top
-
 
 
 def get_speeds(particles):
@@ -203,26 +208,28 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(num_A, num_B, time_step, num_C = 0):
+def particle_simulator(num_A, num_B, time_step, num_C=0):
     # Define two species with different properties
     species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
     species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
-    species_C = Species(name="C", mass=3.0, radius=0.03, color='purple') 
+    species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
     pos_A = np.random.rand(num_A, 2) * 0.4 + 0.05  # left side
-    vel_A = (np.random.rand(num_A, 2) - 0.5)
+    vel_A = np.random.rand(num_A, 2) - 0.5
 
     pos_B = np.random.rand(num_B, 2) * 0.4 + 0.55  # right side
-    vel_B = (np.random.rand(num_B, 2) - 0.5)
+    vel_B = np.random.rand(num_B, 2) - 0.5
 
     pos_C = np.random.rand(num_C, 2) * 0.4 + 0.55  # right side
-    vel_C = (np.random.rand(num_C, 2) - 0.5)
+    vel_C = np.random.rand(num_C, 2) - 0.5
 
-    particles = [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)] + \
-                [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)] + \
-                [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
+    particles = (
+        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
+    )
 
     sim = MDSimulation(particles)
 
@@ -230,10 +237,10 @@ def particle_simulator(num_A, num_B, time_step, num_C = 0):
     dt = 1 / FPS
 
     # Set up plotting
-    fig, ax = plt.subplots(figsize=(6,6))
+    fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    ax.set_aspect('equal', 'box')
+    ax.set_aspect("equal", "box")
     ax.set_xticks([])
     ax.set_yticks([])
 
@@ -245,85 +252,81 @@ def particle_simulator(num_A, num_B, time_step, num_C = 0):
 
     # The 2D Maxwell-Boltzmann equilibrium distribution of speeds.
 
-    #caclulates an average mass for the two particles
+    # caclulates an average mass for the two particles
     masses = [p.mass for p in sim.particles]
     m = np.mean(masses)
 
-    #computes speeds from particles
+    # computes speeds from particles
     speeds = get_speeds(sim.particles)
-    
+
     mean_KE = get_KE(m, speeds) / sim.n
     a = m / 2 / mean_KE
 
-    #speed subplot
+    # speed subplot
     speed_ax = fig.add_subplot(122)
-    speed_hist = Histogram(speeds, xmax=np.max(speeds)*2, nbars=50, density=True)
+    speed_hist = Histogram(speeds, xmax=np.max(speeds) * 2, nbars=50, density=True)
     speed_hist.draw(speed_ax)
 
-    
     # Use a high-resolution grid of speed points so that the exact distribution
     # looks smooth.
     sgrid_hi = np.linspace(0, speed_hist.bins[-1], 200)
     f = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
     (mb_line,) = speed_ax.plot(sgrid_hi, f, c="0.7")
-    
+
     # Maximum value of the 2D Maxwell-Boltzmann speed distribution.
-    fmax = np.sqrt( m / mean_KE / np.e)
+    fmax = np.sqrt(m / mean_KE / np.e)
     speed_ax.set_ylim(0, fmax)
-    
+
     # For the distribution derived by averaging, take the abcissa speed points from
     # the centre of the histogram bars.
     sgrid = (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
     (mb_est_line,) = speed_ax.plot([], [], c="r")
     mb_est = np.zeros(len(sgrid))
-    
+
     # A text label indicating the time and step number for each animation frame.
     xlabel, ylabel = sgrid[-1] / 2, 0.8 * fmax
     label = speed_ax.text(
-            xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
-            )
-    
-    
+        xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
+    )
+
     def init_anim():
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
-    
-    
+
     def animate(i):
         """Advance the animation by one step and update the frame."""
-        
+
         nonlocal mb_est
         sim.advance(dt)
-    
+
         x = [p.pos[X] for p in sim.particles]
         y = [p.pos[Y] for p in sim.particles]
         colors = [p.color for p in sim.particles]
         scatter.set_facecolors(colors)
         scatter.set_offsets(np.column_stack((x, y)))
-    
+
         speeds = get_speeds(sim.particles)
         speed_hist.update(speeds)
-    
+
         # Once the simulation has approached equilibrium a bit, start averaging
         # the speed distribution to indicate the approximation to the Maxwell-
         # Boltzmann distribution.
         if i >= IAV_START:
             mb_est += (speed_hist.hist - mb_est) / (i - IAV_START + 1)
             mb_est_line.set_data(sgrid, mb_est)
-    
+
         label.set_text(f"$t$ = {i * dt:.1f} ns, step = {i:d}")
-    
+
         return scatter, speed_hist.patch, mb_est_line, label
-    
-    
+
     # Only start averaging the speed distribution after frame number IAV_ST.
     IAV_START = 1000
     # Number of frames; set to None to run until explicitly quit.
     frames = 1000
     anim = FuncAnimation(
-            fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
-            )
+        fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
+    )
 
     anim.save("MB_simulation.gif", writer="Pillow")
     plt.show()
