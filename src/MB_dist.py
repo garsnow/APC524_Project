@@ -224,12 +224,12 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probabi
     """
     # Extract properties for species A from Matrix_A and B
     num_A, mass_A, radius_A = Matrix_A
-    num_B, mass_A, radius_B = Matrix_B
+    num_B, mass_B, radius_B = Matrix_B
     num_C, mass_C, radius_C = Matrix_C
 
     # Define two species with different properties
     species_A = Species(name="A", mass=mass_A, radius=radius_A, color="red")
-    species_B = Species(name="B", mass=mass_B, radius_B=mass_B, color="blue")
+    species_B = Species(name="B", mass=mass_B, radius=mass_B, color="blue")
     species_C = Species(name="C", mass=mass_C, radius=mass_C, color="purple")
 
     # Create initial positions and velocities for each species
