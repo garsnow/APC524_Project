@@ -211,22 +211,37 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(num_A, num_B, time_step, reaction_probability, num_C=0):
+def particle_simulator(Martix_A, Matrix_B, Matrix_C, time_step, reaction_probability):
+    """
+    Initialize and run the molecular dynamics simulation.
+
+    Parameters:
+    - Matrix_A: List or NumPy array containing [num_A, mass_A, radius_A]
+    - num_B: Number of particles for species B
+    - time_step: Frames per second (FPS)
+    - reaction_probability: Probability of reaction upon collision
+    - num_C: Number of initial particles for species C (default is 0)
+    """
+    # Extract properties for species A from Matrix_A and B
+    num_A, mass_A, radius_A = Matrix_A
+    num_B, mass_A, radius_B = Matrix_B
+    num_C, mass_C, radius_C = Matrix_C
+
     # Define two species with different properties
-    species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
-    species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
-    species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
+    species_A = Species(name="A", mass=mass_A, radius=radius_A, color="red")
+    species_B = Species(name="B", mass=mass_B, radius_B=mass_B, color="blue")
+    species_C = Species(name="C", mass=mass_C, radius=mass_C, color="purple")
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
-    pos_A = np.random.rand(num_A, 2) * 0.4 + 0.05  # left side
-    vel_A = np.random.rand(num_A, 2) - 0.5
+    pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
+    vel_A = np.random.rand(int(num_A), 2) - 0.5
 
-    pos_B = np.random.rand(num_B, 2) * 0.4 + 0.55  # right side
-    vel_B = np.random.rand(num_B, 2) - 0.5
+    pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
+    vel_B = np.random.rand(int(num_B), 2) - 0.5
 
-    pos_C = np.random.rand(num_C, 2) * 0.4 + 0.55  # right side
-    vel_C = np.random.rand(num_C, 2) - 0.5
+    pos_C = np.random.rand(int(num_C), 2) * 0.4 # middle
+    vel_C = np.random.rand(int(num_C), 2) - 0.5
 
     particles = (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
