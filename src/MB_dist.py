@@ -211,7 +211,7 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(Martix_A, Matrix_B, Matrix_C, time_step, reaction_probability):
+def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probability):
     """
     Initialize and run the molecular dynamics simulation.
 
