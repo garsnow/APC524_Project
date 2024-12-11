@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from scipy.stats import kstest
-from MB_dist import MDSimulation, get_speeds
+from src.MB_dist import MDSimulation, get_speeds
 
 cutoff: float = 0.05
 
