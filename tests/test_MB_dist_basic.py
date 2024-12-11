@@ -14,11 +14,11 @@ X, Y = 0, 1
 
 @pytest.fixture
 def species_A():
-    return Species(name="A", mass=1.0, radius=0.03, color="red")
+    return Species(name="A", mass=1.0, radius=0.05, color="red")
 
 @pytest.fixture
 def species_B():
-    return Species(name="B", mass=2.0, radius=0.03, color="blue")
+    return Species(name="B", mass=2.0, radius=0.05, color="blue")
 
 @pytest.fixture
 def species_C():

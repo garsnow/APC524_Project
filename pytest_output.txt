@@ -19,67 +19,6 @@ tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision PASSED 
 tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection PASSED [ 76%]
 tests/test_MB_dist_basic.py::test_Histogram_init PASSED                  [ 84%]
 tests/test_MB_dist_basic.py::test_Histogram_update PASSED                [ 92%]
-tests/test_MB_dist_basic.py::test_MDSimulation_reaction FAILED           [100%]
+tests/test_MB_dist_basic.py::test_MDSimulation_reaction PASSED           [100%]
 
-=================================== FAILURES ===================================
-__________________________ test_MDSimulation_reaction __________________________
-
-simulation_reaction = <src.MB_dist.MDSimulation object at 0x7f88fced6410>
-species_A = <src.species_and_particle.Species object at 0x7f88fced6440>
-species_B = <src.species_and_particle.Species object at 0x7f88fced5780>
-species_C = <src.species_and_particle.Species object at 0x7f88fced6d10>
-
-    def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, species_C):
-        p1, p2 = simulation_reaction.particles
-    
-        pos_before = p1.pos.copy()
-        vel_before = p1.vel.copy()
-        pos_before_p2 = p2.pos.copy()
-        vel_before_p2 = p2.vel.copy()
-    
-        # Advance the simulation
-        dt = 0.1
->       simulation_reaction.advance(dt)
-
-dt         = 0.1
-p1         = <src.species_and_particle.Particle object at 0x7f88fced5d50>
-p2         = <src.species_and_particle.Particle object at 0x7f88fced6080>
-pos_before = array([0.45, 0.5 ])
-pos_before_p2 = array([0.55, 0.5 ])
-simulation_reaction = <src.MB_dist.MDSimulation object at 0x7f88fced6410>
-species_A  = <src.species_and_particle.Species object at 0x7f88fced6440>
-species_B  = <src.species_and_particle.Species object at 0x7f88fced5780>
-species_C  = <src.species_and_particle.Species object at 0x7f88fced6d10>
-vel_before = array([1., 0.])
-vel_before_p2 = array([-1.,  0.])
-
-tests/test_MB_dist_basic.py:246: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-src/MB_dist.py:42: in advance
-    radii = np.array([p.radius for p in self.particles])
-        dist_matrix = array([[inf, 0.1],
-       [0.1, inf]])
-        dt         = 0.1
-        p          = <src.species_and_particle.Particle object at 0x7f88fced6080>
-        pos_array  = array([[0.55, 0.5 ],
-       [0.45, 0.5 ]])
-        self       = <src.MB_dist.MDSimulation object at 0x7f88fced6410>
-src/MB_dist.py:42: in <listcomp>
-    radii = np.array([p.radius for p in self.particles])
-        .0         = <list_iterator object at 0x7f88fced6c80>
-        p          = <src.species_and_particle.Particle object at 0x7f88fced5d50>
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <src.species_and_particle.Particle object at 0x7f88fced5d50>
-
-    @property
-    def radius(self):
->       return self.species.radius
-E       AttributeError: 'function' object has no attribute 'radius'
-
-self       = <src.species_and_particle.Particle object at 0x7f88fced5d50>
-
-src/species_and_particle.py:26: AttributeError
-=========================== short test summary info ============================
-FAILED tests/test_MB_dist_basic.py::test_MDSimulation_reaction - AttributeErr...
-========================= 1 failed, 12 passed in 0.81s =========================
+============================== 13 passed in 0.76s ==============================
