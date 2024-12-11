@@ -394,4 +394,5 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     plt.ylabel("Concentration (particles/area)")
     plt.legend()
     plt.title("Concentration vs Time")
+    plt.savefig("MB_simulation.png")
     plt.show()
