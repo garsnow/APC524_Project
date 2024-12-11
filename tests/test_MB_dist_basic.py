@@ -47,6 +47,18 @@ def simulation(particle_A, particle_B):
     particles = [particle_A, particle_B]
     return MDSimulation(particles)
 
+@pytest.fixture
+def simulation_reaction(particle_A, particle_B):
+    particles = [particle_A, particle_B]
+    return MDSimulation(particles)
+
+@pytest.fixture
+def simulation_elastic(species_A):
+    # Create two particles of the same species to test elastic collision
+    p1 = Particle(species_A, np.array([0.2, 0.5]), np.array([1.0, 0.0]))
+    p2 = Particle(species_A, np.array([0.8, 0.5]), np.array([-1.0, 0.0]))
+    return MDSimulation([p1, p2])
+
 # Testing the get_speeds function
 @pytest.mark.parametrize(
     "particles, expected_speeds",
@@ -122,8 +134,8 @@ def test_MDSimulation_init(particle_A, particle_B):
 
 # Testing MDsimulation.advance
 # with collision
-def test_MDSimulation_advance_with_collision(simulation, species_A, species_B):
-    p1, p2 = simulation.particles
+def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
+    p1, p2 = simulation_elastic.particles
 
     pos_before = p1.pos.copy()
     vel_before = p1.vel.copy()
@@ -132,7 +144,7 @@ def test_MDSimulation_advance_with_collision(simulation, species_A, species_B):
 
      # Advance the simulation
     dt = 0.1
-    simulation.advance(dt)
+    simulation_elastic.advance(dt)
 
     expected_pos_p1 = pos_before + vel_before * dt
     expected_pos_p2 = pos_before_p2 + vel_before_p2 * dt
@@ -231,22 +243,25 @@ def test_Histogram_update():
     expected_top = np.zeros(len(expected_hist)) + expected_hist
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
     
-def test_MDSimulation_reaction(species_A, species_B, species_C):
-    # Create species A and B particles positioned to collide
-    p1 = Particle(species_A, np.array([0.4, 0.5]), np.array([1.0, 0.0]))
-    p2 = Particle(species_B, np.array([0.6, 0.5]), np.array([-1.0, 0.0]))
-    
-    sim = MDSimulation([p1, p2])
+def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, species_C):
+    p1, p2 = simulation_reaction.particles
+
+    pos_before = p1.pos.copy()
+    vel_before = p1.vel.copy()
+    pos_before_p2 = p2.pos.copy()
+    vel_before_p2 = p2.vel.copy()
+
+    # Advance the simulation
     dt = 0.1
-    sim.advance(dt)
-    
+    simulation_reaction.advance(dt)
+
     # After advance, particles should have reacted to form a new C particle
-    assert len(sim.particles) == 1  # Only species C remains
-    new_p = sim.particles[0]
+    assert len(simulation_reaction.particles) == 1  # Only species C remains
+    new_p = simulation_reaction.particles[0]
     assert new_p.species.name == "C"
     expected_pos = 0.5 * (p1.pos + p2.pos)
     expected_vel = (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
-    
+
     np.testing.assert_array_almost_equal(new_p.pos, expected_pos)
     np.testing.assert_array_almost_equal(new_p.vel, expected_vel)
-    assert sim.nsteps == 1
+    assert simulation_reaction.nsteps == 1
