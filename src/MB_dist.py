@@ -211,7 +211,7 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probability):
+def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     """
     Initialize and run the molecular dynamics simulation.
 
@@ -222,6 +222,16 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probabi
     - reaction_probability: Probability of reaction upon collision
     - num_C: Number of initial particles for species C (default is 0)
     """
+
+     # Validate Matrix_A
+    if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
+        raise ValueError("Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]")
+    
+    # Similarly validate Matrix_B and Matrix_C
+    for Matrix, name in zip([Matrix_B, Matrix_C], ['Matrix_B', 'Matrix_C']):
+        if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
+            raise ValueError(f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]")
+    
     # Extract properties for species A from Matrix_A and B
     num_A, mass_A, radius_A = Matrix_A
     num_B, mass_B, radius_B = Matrix_B
@@ -229,8 +239,8 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probabi
 
     # Define two species with different properties
     species_A = Species(name="A", mass=mass_A, radius=radius_A, color="red")
-    species_B = Species(name="B", mass=mass_B, radius=mass_B, color="blue")
-    species_C = Species(name="C", mass=mass_C, radius=mass_C, color="purple")
+    species_B = Species(name="B", mass=mass_B, radius=radius_B, color="blue")
+    species_C = Species(name="C", mass=mass_C, radius=radius_C, color="purple")
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
@@ -240,7 +250,7 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probabi
     pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
     vel_B = np.random.rand(int(num_B), 2) - 0.5
 
-    pos_C = np.random.rand(int(num_C), 2) * 0.4 # middle
+    pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3 # middle
     vel_C = np.random.rand(int(num_C), 2) - 0.5
 
     particles = (
@@ -251,7 +261,6 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, time_step, reaction_probabi
 
     sim = MDSimulation(particles, reaction_probability)
 
-    FPS = time_step
     dt = 1 / FPS
 
     # Set up plotting
