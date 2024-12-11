@@ -6,18 +6,24 @@ from src.MB_dist import MDSimulation, Particle, Species, get_speeds
 
 cutoff: float = 0.05
 
+# Initialize the random number generator
+rng = np.random.default_rng()
+
 
 def is_maxwell_boltzmann(speeds: np.ndarray, masses: np.ndarray, T: float) -> bool:
     kb: float = 1.38e-23
-    cdf = lambda v: sum(
-        [
-            (2 / np.sqrt(np.pi))
-            * (np.sqrt(m / (2 * kb * T)) ** 3)
-            * v**2
-            * np.exp(-m * v**2 / (2 * kb * T))
-            for m in masses
-        ]
-    )
+
+    def cdf(v: float) -> float:
+        return sum(
+            [
+                (2 / np.sqrt(np.pi))
+                * (np.sqrt(m / (2 * kb * T)) ** 3)
+                * v**2
+                * np.exp(-m * v**2 / (2 * kb * T))
+                for m in masses
+            ]
+        )
+
     d, p_value = kstest(speeds, cdf)
     return p_value < cutoff
 
@@ -30,19 +36,19 @@ def setup_simulation():
     species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
     species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
-    pos_A = np.random.rand(num_A, 2)  # Random positions
-    vel_A = np.random.rand(num_A, 2) - 0.5  # Random velocities
+    pos_A = rng.random((num_A, 2))  # Random positions
+    vel_A = rng.random((num_A, 2)) - 0.5  # Random velocities
 
-    pos_B = np.random.rand(num_B, 2)  # Random positions
-    vel_B = np.random.rand(num_B, 2) - 0.5  # Random velocities
+    pos_B = rng.random((num_B, 2))  # Random positions
+    vel_B = rng.random((num_B, 2)) - 0.5  # Random velocities
 
-    pos_C = np.random.rand(num_C, 2)  # Random positions
-    vel_C = np.random.rand(num_C, 2) - 0.5  # Random velocities
+    pos_C = rng.random((num_C, 2))  # Random positions
+    vel_C = rng.random((num_C, 2)) - 0.5  # Random velocities
 
     particles = (
-        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
-        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
-        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
+        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
     )
 
     sim = MDSimulation(particles)
@@ -60,7 +66,7 @@ def test_MB():
 
     # Run the simulation for a sufficient number of steps to reach equilibrium
     num_steps = 1000
-    for step in range(num_steps):
+    for _ in range(num_steps):
         sim.advance(dt)
 
     # Extract the final speeds from the simulation
@@ -78,3 +84,4 @@ def test_basic():
 
 if __name__ == "__main__":
     pytest.main()
+
