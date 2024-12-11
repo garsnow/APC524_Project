@@ -1,16 +1,19 @@
 import MB_dist
 
-
-def caller(number_of_particles, FPS, reaction_probability):
+def caller(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     '''
     This is an external file to call the particle simulator.
 
     Inputs
-        number_of_particles (int): Total number of particles in the simulation.
+        Matrix_A,B,C: For each individual particle type, specifies the 
+                      initial number, mass, and radius
         FPS (int): Frames per second, determines the time step for updates.
+        reaction_probability: When A and B collide, how often do they react to form C
     '''
-    num_A = number_of_particles // 2
-    num_B = number_of_particles - num_A 
-    MB_dist.particle_simulator(num_A, num_B, FPS, reaction_probability)
-
-caller(1000,30, 0.5)
+    MB_dist.particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability)
+    
+# Matrix template: Matrix_A = [number of initial A particles, A mass, A radius]
+Matrix_A = [500, 1.0, 0.01]
+Matrix_B = [500, 2.0, 0.02]
+Matrix_C = [0, 3.0, 0.03]
+caller(Matrix_A, Matrix_B, Matrix_C, 30, 0.5)
