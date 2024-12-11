@@ -49,8 +49,10 @@ def simulation(particle_A, particle_B):
 
 @pytest.fixture
 def simulation_reaction(particle_A, particle_B):
-    particles = [particle_A, particle_B]
-    return MDSimulation(particles)
+    # Create two particles positioned to collide after dt=0.1
+    p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
+    p2 = Particle(species_B, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
+    return MDSimulation([p1, p2])
 
 @pytest.fixture
 def simulation_elastic(species_A):
