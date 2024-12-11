@@ -14,25 +14,25 @@ X, Y = 0, 1
 
 @pytest.fixture
 def species_A():
-    return Species(name="A", mass=1.0, radius=0.5, color="red")
+    return Species(name="A", mass=1.0, radius=0.05, color="red")
 
 @pytest.fixture
 def species_B():
-    return Species(name="B", mass=2.0, radius=0.5, color="blue")
+    return Species(name="B", mass=2.0, radius=0.05, color="blue")
 
 @pytest.fixture
 def species_C():
-    return Species(name="C", mass=3.0, radius=0.5, color='purple')
+    return Species(name="C", mass=3.0, radius=0.05, color='purple')
 
 @pytest.fixture
 def particle_A(species_A):
-    pos = np.array([0.1, 0.1])
+    pos = np.array([0.2, 0.5])
     vel = np.array([1.0, 0.0])
     return Particle(species_A, pos, vel)
 
 @pytest.fixture
 def particle_B(species_B):
-    pos = np.array([0.9, 0.9])
+    pos = np.array([0.8, 0.5])
     vel = np.array([-1.0, 0.0])
     return Particle(species_B, pos, vel)
 
@@ -55,8 +55,8 @@ def simulation_reaction(particle_A, particle_B):
 @pytest.fixture
 def simulation_elastic(species_A):
     # Create two particles of the same species to test elastic collision
-    p1 = Particle(species_A, np.array([0.2, 0.5]), np.array([1.0, 0.0]))
-    p2 = Particle(species_A, np.array([0.8, 0.5]), np.array([-1.0, 0.0]))
+    p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
+    p2 = Particle(species_A, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
     return MDSimulation([p1, p2])
 
 # Testing the get_speeds function
@@ -147,12 +147,13 @@ def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
     simulation_elastic.advance(dt)
 
     expected_pos_p1 = pos_before + vel_before * dt
-    expected_pos_p2 = pos_before_p2 + vel_before_p2 * dt
-    np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
-    np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
+    expected_pos_p2 = pos_before_p2 + vel_before_p2 * dt    
 
     expected_vel_p1 = vel_before_p2  # [-1.0, 0.0]
-    expected_vel_p2 = vel_before  
+    expected_vel_p2 = vel_before      # [1.0, 0.0]
+    
+    np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+    np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
     np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
     np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
     assert simulation_elastic.nsteps == 1
