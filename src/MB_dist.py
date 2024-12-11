@@ -242,6 +242,13 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     species_B = Species(name="B", mass=mass_B, radius=radius_B, color="blue")
     species_C = Species(name="C", mass=mass_C, radius=radius_C, color="purple")
 
+    # initializes counters for time, and number of A,B,C
+    # used to create concentration vs time profiles 
+    time_steps = []
+    count_A = []
+    count_B = []
+    count_C = []
+    
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
     pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
@@ -327,6 +334,17 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
         nonlocal mb_est
         sim.advance(dt)
 
+        #counts ABC for concentration profiles
+        nA = sum(1 for p in sim.particles if p.species.name == "A")
+        nB = sum(1 for p in sim.particles if p.species.name == "B")
+        nC = sum(1 for p in sim.particles if p.species.name == "C")
+
+        #appends concentration v time after each timestep
+        time_steps.append(i * dt)
+        count_A.append(nA)
+        count_B.append(nB)
+        count_C.append(nC)
+
         x = [p.pos[X] for p in sim.particles]
         y = [p.pos[Y] for p in sim.particles]
         colors = [p.color for p in sim.particles]
@@ -356,4 +374,16 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     )
 
     anim.save("MB_simulation.gif", writer="Pillow")
+    plt.show()
+
+    #concentration vs time graph
+    plt.figure()
+    #deletes last 100 list elements because the simulation resets and it messes up the graph
+    plt.plot(time_steps[:-100], count_A[:-100], label='[A]')
+    plt.plot(time_steps[:-100], count_B[:-100], label='[B]')
+    plt.plot(time_steps[:-100], count_C[:-100], label='[C]')
+    plt.xlabel('Time (ns)')
+    plt.ylabel('Concentration (particles/area)')
+    plt.legend()
+    plt.title('Concentration vs Time')
     plt.show()
