@@ -4,9 +4,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+# Initialize the random number generator
+rng = np.random.default_rng()
+
 # Add 'src/' directory to sys.path
 src_path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, src_path.resolve())
+sys.path.insert(0, src_path.resolve())  # noqa: E402
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
@@ -243,7 +246,7 @@ def test_MDSimulation_advance_without_collision(species_A, species_B):
     assert sim.nsteps == number_steps
 
 
-# collision with wall (MDSimulation boundary reflection)
+# Collision with wall (MDSimulation boundary reflection)
 def test_MDSimulation_boundary_reflection(species_A, species_B):
     # Create particles positioned to collide with walls
     p1 = Particle(species_A, np.array([0.05, 0.5]), np.array([-1.0, 0.0]))  # Left wall
@@ -268,7 +271,7 @@ def test_MDSimulation_boundary_reflection(species_A, species_B):
     assert sim.nsteps == number_steps
 
 
-# Testing Histogram class initilization
+# Testing Histogram class initialization
 def test_Histogram_init():
     data = np.array([1, 2, 2, 3, 3, 3])
     xmax = 4
