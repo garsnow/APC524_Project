@@ -14,15 +14,15 @@ X, Y = 0, 1
 
 @pytest.fixture
 def species_A():
-    return Species(name="A", mass=1.0, radius=0.05, color="red")
+    return Species(name="A", mass=1.0, radius=0.03, color="red")
 
 @pytest.fixture
 def species_B():
-    return Species(name="B", mass=2.0, radius=0.05, color="blue")
+    return Species(name="B", mass=2.0, radius=0.03, color="blue")
 
 @pytest.fixture
 def species_C():
-    return Species(name="C", mass=3.0, radius=0.05, color='purple')
+    return Species(name="C", mass=3.0, radius=0.03, color='purple')
 
 @pytest.fixture
 def particle_A(species_A):
@@ -48,7 +48,7 @@ def simulation(particle_A, particle_B):
     return MDSimulation(particles)
 
 @pytest.fixture
-def simulation_reaction(particle_A, particle_B):
+def simulation_reaction(species_A, species_B):
     # Create two particles positioned to collide after dt=0.1
     p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
