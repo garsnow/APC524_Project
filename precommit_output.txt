@@ -1,0 +1,245 @@
+check for added large files..............................................[42mPassed[m
+check for case conflicts.................................................[42mPassed[m
+check for merge conflicts................................................[42mPassed[m
+check for broken symlinks............................(no files to check)[46;30mSkipped[m
+check yaml...............................................................[42mPassed[m
+debug statements (python)................................................[42mPassed[m
+fix end of files.........................................................[42mPassed[m
+mixed line ending........................................................[42mPassed[m
+fix requirements.txt.................................(no files to check)[46;30mSkipped[m
+trim trailing whitespace.................................................[42mPassed[m
+ruff.....................................................................[41mFailed[m
+[2m- hook id: ruff[m
+[2m- exit code: 1[m
+
+[1msrc/MB_dist.py[0m[36m:[0m2[36m:[0m8[36m:[0m [1;31mICN001[0m `matplotlib` should be imported as `mpl`
+[1;38;5;12m  |[0m
+[1;38;5;12m1 |[0m # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
+[1;38;5;12m2 |[0m import matplotlib
+[1;38;5;12m  |[0m[1;38;5;9m        ^^^^^^^^^^[0m [1;38;5;9mICN001[0m
+[1;38;5;12m3 |[0m 
+[1;38;5;12m4 |[0m matplotlib.use("TkAgg")
+[1;38;5;12m  |[0m
+  [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Alias `matplotlib` to `mpl`
+
+[1msrc/MB_dist.py[0m[36m:[0m216[36m:[0m5[36m:[0m [1;31mPLR0915[0m Too many statements (91 > 50)
+[1;38;5;12m    |[0m
+[1;38;5;12m216 |[0m def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
+[1;38;5;12m    |[0m[1;38;5;9m     ^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mPLR0915[0m
+[1;38;5;12m217 |[0m     """
+[1;38;5;12m218 |[0m     Initialize and run the molecular dynamics simulation.
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m229[36m:[0m13[36m:[0m [1;31mUP038[0m Use `X | Y` in `isinstance` call instead of `(X, Y)`
+[1;38;5;12m    |[0m
+[1;38;5;12m228 |[0m     # Validate Matrix_A
+[1;38;5;12m229 |[0m     if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mUP038[0m
+[1;38;5;12m230 |[0m         raise ValueError(
+[1;38;5;12m231 |[0m             "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Convert to `X | Y`
+
+[1msrc/MB_dist.py[0m[36m:[0m229[36m:[0m82[36m:[0m [1;31mPLR2004[0m Magic value used in comparison, consider replacing `3` with a constant variable
+[1;38;5;12m    |[0m
+[1;38;5;12m228 |[0m     # Validate Matrix_A
+[1;38;5;12m229 |[0m     if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                  ^[0m [1;38;5;9mPLR2004[0m
+[1;38;5;12m230 |[0m         raise ValueError(
+[1;38;5;12m231 |[0m             "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m231[36m:[0m13[36m:[0m [1;31mEM101[0m Exception must not use a string literal, assign to variable first
+[1;38;5;12m    |[0m
+[1;38;5;12m229 |[0m     if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
+[1;38;5;12m230 |[0m         raise ValueError(
+[1;38;5;12m231 |[0m             "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mEM101[0m
+[1;38;5;12m232 |[0m         )
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Assign to variable; remove string literal
+
+[1msrc/MB_dist.py[0m[36m:[0m238[36m:[0m17[36m:[0m [1;31mUP038[0m Use `X | Y` in `isinstance` call instead of `(X, Y)`
+[1;38;5;12m    |[0m
+[1;38;5;12m236 |[0m         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
+[1;38;5;12m237 |[0m     ):
+[1;38;5;12m238 |[0m         if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
+[1;38;5;12m    |[0m[1;38;5;9m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mUP038[0m
+[1;38;5;12m239 |[0m             raise ValueError(
+[1;38;5;12m240 |[0m                 f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]"
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Convert to `X | Y`
+
+[1msrc/MB_dist.py[0m[36m:[0m238[36m:[0m82[36m:[0m [1;31mPLR2004[0m Magic value used in comparison, consider replacing `3` with a constant variable
+[1;38;5;12m    |[0m
+[1;38;5;12m236 |[0m         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
+[1;38;5;12m237 |[0m     ):
+[1;38;5;12m238 |[0m         if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                  ^[0m [1;38;5;9mPLR2004[0m
+[1;38;5;12m239 |[0m             raise ValueError(
+[1;38;5;12m240 |[0m                 f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]"
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m240[36m:[0m17[36m:[0m [1;31mEM102[0m Exception must not use an f-string literal, assign to variable first
+[1;38;5;12m    |[0m
+[1;38;5;12m238 |[0m         if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
+[1;38;5;12m239 |[0m             raise ValueError(
+[1;38;5;12m240 |[0m                 f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]"
+[1;38;5;12m    |[0m[1;38;5;9m                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mEM102[0m
+[1;38;5;12m241 |[0m             )
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Assign to variable; remove f-string literal
+
+[1msrc/MB_dist.py[0m[36m:[0m262[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m260 |[0m     # Create initial positions and velocities for each species
+[1;38;5;12m261 |[0m     # For simplicity, place species A on the left side, species B on the right
+[1;38;5;12m262 |[0m     pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m263 |[0m     vel_A = np.random.rand(int(num_A), 2) - 0.5
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m263[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m261 |[0m     # For simplicity, place species A on the left side, species B on the right
+[1;38;5;12m262 |[0m     pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
+[1;38;5;12m263 |[0m     vel_A = np.random.rand(int(num_A), 2) - 0.5
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m264 |[0m 
+[1;38;5;12m265 |[0m     pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m265[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m263 |[0m     vel_A = np.random.rand(int(num_A), 2) - 0.5
+[1;38;5;12m264 |[0m 
+[1;38;5;12m265 |[0m     pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m266 |[0m     vel_B = np.random.rand(int(num_B), 2) - 0.5
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m266[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m265 |[0m     pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
+[1;38;5;12m266 |[0m     vel_B = np.random.rand(int(num_B), 2) - 0.5
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m267 |[0m 
+[1;38;5;12m268 |[0m     pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3  # middle
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m268[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m266 |[0m     vel_B = np.random.rand(int(num_B), 2) - 0.5
+[1;38;5;12m267 |[0m 
+[1;38;5;12m268 |[0m     pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3  # middle
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m269 |[0m     vel_C = np.random.rand(int(num_C), 2) - 0.5
+[1;38;5;12m    |[0m
+
+[1msrc/MB_dist.py[0m[36m:[0m269[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m    |[0m
+[1;38;5;12m268 |[0m     pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3  # middle
+[1;38;5;12m269 |[0m     vel_C = np.random.rand(int(num_C), 2) - 0.5
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m270 |[0m 
+[1;38;5;12m271 |[0m     particles = (
+[1;38;5;12m    |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m12[36m:[0m5[36m:[0m [1;31mE731[0m Do not assign a `lambda` expression, use a `def`
+[1;38;5;12m   |[0m
+[1;38;5;12m10 |[0m   def is_maxwell_boltzmann(speeds: np.ndarray, masses: np.ndarray, T: float) -> bool:
+[1;38;5;12m11 |[0m       kb: float = 1.38e-23
+[1;38;5;12m12 |[0m       cdf = lambda v: sum(
+[1;38;5;12m   |[0m  [1;38;5;9m_____^[0m
+[1;38;5;12m13 |[0m [1;38;5;9m|[0m         [
+[1;38;5;12m14 |[0m [1;38;5;9m|[0m             (2 / np.sqrt(np.pi))
+[1;38;5;12m15 |[0m [1;38;5;9m|[0m             * (np.sqrt(m / (2 * kb * T)) ** 3)
+[1;38;5;12m16 |[0m [1;38;5;9m|[0m             * v**2
+[1;38;5;12m17 |[0m [1;38;5;9m|[0m             * np.exp(-m * v**2 / (2 * kb * T))
+[1;38;5;12m18 |[0m [1;38;5;9m|[0m             for m in masses
+[1;38;5;12m19 |[0m [1;38;5;9m|[0m         ]
+[1;38;5;12m20 |[0m [1;38;5;9m|[0m     )
+[1;38;5;12m   |[0m [1;38;5;9m|[0m[1;38;5;9m_____^[0m [1;38;5;9mE731[0m
+[1;38;5;12m21 |[0m       d, p_value = kstest(speeds, cdf)
+[1;38;5;12m22 |[0m       return p_value < cutoff
+[1;38;5;12m   |[0m
+   [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Rewrite `cdf` as a `def`
+
+[1mtests/test_MB_dist.py[0m[36m:[0m33[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m31 |[0m     species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
+[1;38;5;12m32 |[0m 
+[1;38;5;12m33 |[0m     pos_A = np.random.rand(num_A, 2)  # Random positions
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m34 |[0m     vel_A = np.random.rand(num_A, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m34[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m33 |[0m     pos_A = np.random.rand(num_A, 2)  # Random positions
+[1;38;5;12m34 |[0m     vel_A = np.random.rand(num_A, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m35 |[0m 
+[1;38;5;12m36 |[0m     pos_B = np.random.rand(num_B, 2)  # Random positions
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m36[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m34 |[0m     vel_A = np.random.rand(num_A, 2) - 0.5  # Random velocities
+[1;38;5;12m35 |[0m 
+[1;38;5;12m36 |[0m     pos_B = np.random.rand(num_B, 2)  # Random positions
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m37 |[0m     vel_B = np.random.rand(num_B, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m37[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m36 |[0m     pos_B = np.random.rand(num_B, 2)  # Random positions
+[1;38;5;12m37 |[0m     vel_B = np.random.rand(num_B, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m38 |[0m 
+[1;38;5;12m39 |[0m     pos_C = np.random.rand(num_C, 2)  # Random positions
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m39[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m37 |[0m     vel_B = np.random.rand(num_B, 2) - 0.5  # Random velocities
+[1;38;5;12m38 |[0m 
+[1;38;5;12m39 |[0m     pos_C = np.random.rand(num_C, 2)  # Random positions
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m40 |[0m     vel_C = np.random.rand(num_C, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m40[36m:[0m13[36m:[0m [1;31mNPY002[0m Replace legacy `np.random.rand` call with `np.random.Generator`
+[1;38;5;12m   |[0m
+[1;38;5;12m39 |[0m     pos_C = np.random.rand(num_C, 2)  # Random positions
+[1;38;5;12m40 |[0m     vel_C = np.random.rand(num_C, 2) - 0.5  # Random velocities
+[1;38;5;12m   |[0m[1;38;5;9m             ^^^^^^^^^^^^^^[0m [1;38;5;9mNPY002[0m
+[1;38;5;12m41 |[0m 
+[1;38;5;12m42 |[0m     particles = (
+[1;38;5;12m   |[0m
+
+[1mtests/test_MB_dist.py[0m[36m:[0m63[36m:[0m9[36m:[0m [1;31mB007[0m Loop control variable `step` not used within loop body
+[1;38;5;12m   |[0m
+[1;38;5;12m61 |[0m     # Run the simulation for a sufficient number of steps to reach equilibrium
+[1;38;5;12m62 |[0m     num_steps = 1000
+[1;38;5;12m63 |[0m     for step in range(num_steps):
+[1;38;5;12m   |[0m[1;38;5;9m         ^^^^[0m [1;38;5;9mB007[0m
+[1;38;5;12m64 |[0m         sim.advance(dt)
+[1;38;5;12m   |[0m
+   [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Rename unused `step` to `_step`
+
+[1mtests/test_MB_dist_basic.py[0m[36m:[0m11[36m:[0m1[36m:[0m [1;31mE402[0m Module level import not at top of file
+[1;38;5;12m   |[0m
+[1;38;5;12m 9 |[0m sys.path.insert(0, src_path.resolve())
+[1;38;5;12m10 |[0m 
+[1;38;5;12m11 |[0m from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
+[1;38;5;12m   |[0m[1;38;5;9m ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE402[0m
+[1;38;5;12m12 |[0m 
+[1;38;5;12m13 |[0m X, Y = 0, 1
+[1;38;5;12m   |[0m
+
+Found 23 errors.
+No fixes available (7 hidden fixes can be enabled with the `--unsafe-fixes` option).
+
+ruff-format..............................................................[42mPassed[m

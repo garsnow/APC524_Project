@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
+import pytest
 from scipy.stats import kstest
-from src.MB_dist import MDSimulation, get_speeds, Species, Particle
+
+from src.MB_dist import MDSimulation, Particle, Species, get_speeds
 
 cutoff: float = 0.05
 
@@ -39,9 +40,9 @@ def setup_simulation():
     vel_C = np.random.rand(num_C, 2) - 0.5  # Random velocities
 
     particles = (
-        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
+        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
+        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
+        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
     )
 
     sim = MDSimulation(particles)

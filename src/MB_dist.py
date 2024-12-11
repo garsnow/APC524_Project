@@ -2,12 +2,13 @@
 import matplotlib
 
 matplotlib.use("TkAgg")
+import random
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
-import random
 
 X, Y = 0, 1
 
@@ -79,7 +80,7 @@ class MDSimulation:
         iarr, jarr = iarr[k], jarr[k]
 
         # Resolve particle collisions
-        for i, j in zip(iarr, jarr):
+        for i, j in zip(iarr, jarr, strict=False):
             self.resolve_collision(self.particles[i], self.particles[j])
 
         # delete A,B and add C to particles list
@@ -115,9 +116,10 @@ class MDSimulation:
     # treats particle collision as elastic
     def resolve_collision(self, p1, p2):
         # if collision between A&B --> C
-        if (p1.species.name == "A" and p2.species.name == "B") or (
-            p1.species.name == "B" and p2.species.name == "A") and (
-                random.random() < self.reaction_probability
+        if (
+            (p1.species.name == "A" and p2.species.name == "B")
+            or (p1.species.name == "B" and p2.species.name == "A")
+            and (random.random() < self.reaction_probability)
         ):
             new_pos = 0.5 * (p1.pos + p2.pos)
             m1, m2 = p1.mass, p2.mass
@@ -223,15 +225,21 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     - num_C: Number of initial particles for species C (default is 0)
     """
 
-     # Validate Matrix_A
+    # Validate Matrix_A
     if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
-        raise ValueError("Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]")
-    
+        raise ValueError(
+            "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
+        )
+
     # Similarly validate Matrix_B and Matrix_C
-    for Matrix, name in zip([Matrix_B, Matrix_C], ['Matrix_B', 'Matrix_C']):
+    for Matrix, name in zip(
+        [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
+    ):
         if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
-            raise ValueError(f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]")
-    
+            raise ValueError(
+                f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]"
+            )
+
     # Extract properties for species A from Matrix_A and B
     num_A, mass_A, radius_A = Matrix_A
     num_B, mass_B, radius_B = Matrix_B
@@ -243,12 +251,12 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     species_C = Species(name="C", mass=mass_C, radius=radius_C, color="purple")
 
     # initializes counters for time, and number of A,B,C
-    # used to create concentration vs time profiles 
+    # used to create concentration vs time profiles
     time_steps = []
     count_A = []
     count_B = []
     count_C = []
-    
+
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
     pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
@@ -257,13 +265,13 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
     vel_B = np.random.rand(int(num_B), 2) - 0.5
 
-    pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3 # middle
+    pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3  # middle
     vel_C = np.random.rand(int(num_C), 2) - 0.5
 
     particles = (
-        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
+        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
+        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
+        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
     )
 
     sim = MDSimulation(particles, reaction_probability)
@@ -334,12 +342,12 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
         nonlocal mb_est
         sim.advance(dt)
 
-        #counts ABC for concentration profiles
+        # counts ABC for concentration profiles
         nA = sum(1 for p in sim.particles if p.species.name == "A")
         nB = sum(1 for p in sim.particles if p.species.name == "B")
         nC = sum(1 for p in sim.particles if p.species.name == "C")
 
-        #appends concentration v time after each timestep
+        # appends concentration v time after each timestep
         time_steps.append(i * dt)
         count_A.append(nA)
         count_B.append(nB)
@@ -376,14 +384,14 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     anim.save("MB_simulation.gif", writer="Pillow")
     plt.show()
 
-    #concentration vs time graph
+    # concentration vs time graph
     plt.figure()
-    #deletes last 100 list elements because the simulation resets and it messes up the graph
-    plt.plot(time_steps[:-100], count_A[:-100], label='[A]')
-    plt.plot(time_steps[:-100], count_B[:-100], label='[B]')
-    plt.plot(time_steps[:-100], count_C[:-100], label='[C]')
-    plt.xlabel('Time (ns)')
-    plt.ylabel('Concentration (particles/area)')
+    # deletes last 100 list elements because the simulation resets and it messes up the graph
+    plt.plot(time_steps[:-100], count_A[:-100], label="[A]")
+    plt.plot(time_steps[:-100], count_B[:-100], label="[B]")
+    plt.plot(time_steps[:-100], count_C[:-100], label="[C]")
+    plt.xlabel("Time (ns)")
+    plt.ylabel("Concentration (particles/area)")
     plt.legend()
-    plt.title('Concentration vs Time')
+    plt.title("Concentration vs Time")
     plt.show()

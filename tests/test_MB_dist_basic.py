@@ -1,14 +1,14 @@
-import os
 import sys
-import pytest
+from pathlib import Path
+
 import numpy as np
+import pytest
 
 # Add 'src/' directory to sys.path
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
-)
+src_path = Path(__file__).parent.parent / "src"
+sys.path.insert(0, src_path.resolve())
 
-from src.MB_dist import get_speeds, get_KE, MDSimulation, Histogram, Species, Particle
+from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
 X, Y = 0, 1
 
@@ -61,7 +61,7 @@ def simulation_reaction(species_A, species_B):
     # Create two particles positioned to collide after dt=0.1
     p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
-    reaction_probability = 1.0 # always react
+    reaction_probability = 1.0  # always react
     return MDSimulation([p1, p2], reaction_probability)
 
 
@@ -70,13 +70,13 @@ def simulation_elastic(species_A):
     # Create two particles of the same species to test elastic collision
     p1 = Particle(species_A, np.array([0.45, 0.5]), np.array([1.0, 0.0]))
     p2 = Particle(species_A, np.array([0.55, 0.5]), np.array([-1.0, 0.0]))
-    reaction_probability = 0.0 # no reaction
+    reaction_probability = 0.0  # no reaction
     return MDSimulation([p1, p2], reaction_probability)
 
 
 # Testing the get_speeds function
 @pytest.mark.parametrize(
-    "particles, expected_speeds",
+    ("particles", "expected_speeds"),
     [
         # Basic positive velocities
         (
@@ -182,9 +182,10 @@ def test_get_KE():
 def test_MDSimulation_init(particle_A, particle_B):
     reaction_probability = 0.0
     sim = MDSimulation([particle_A, particle_B], reaction_probability)
-
-    assert sim.n == 2
-    assert sim.nsteps == 0
+    number_of_particles = 2
+    number_steps = 0
+    assert sim.n == number_of_particles
+    assert sim.nsteps == number_steps
     assert sim.particles == [particle_A, particle_B]
     assert sim.reaction_probability == reaction_probability
     assert sim.reactions == []
@@ -192,7 +193,7 @@ def test_MDSimulation_init(particle_A, particle_B):
 
 # Testing MDsimulation.advance
 # with collision
-def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
+def test_MDSimulation_advance_with_collision(simulation_elastic):
     p1, p2 = simulation_elastic.particles
 
     pos_before = p1.pos.copy()
@@ -214,14 +215,16 @@ def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
     np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
     np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
     np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
-    assert simulation_elastic.nsteps == 1
+
+    number_steps = 1
+    assert simulation_elastic.nsteps == number_steps
 
 
 # MDsimulation without collision
-def test_MDSimulation_advance_without_collision(simulation, species_A, species_B):
+def test_MDSimulation_advance_without_collision(species_A, species_B):
     p1 = Particle(species_A, np.array([0.2, 0.2]), np.array([1.0, 0.0]))
     p2 = Particle(species_B, np.array([0.8, 0.8]), np.array([0.0, 1.0]))
-    
+
     reaction_probability = 0.0
     sim = MDSimulation([p1, p2], reaction_probability)
     dt = 0.1
@@ -236,7 +239,8 @@ def test_MDSimulation_advance_without_collision(simulation, species_A, species_B
     np.testing.assert_array_almost_equal(p1.vel, np.array([1.0, 0.0]))
     np.testing.assert_array_almost_equal(p2.vel, np.array([0.0, 1.0]))
 
-    assert sim.nsteps == 1
+    number_steps = 1
+    assert sim.nsteps == number_steps
 
 
 # collision with wall (MDSimulation boundary reflection)
@@ -260,7 +264,8 @@ def test_MDSimulation_boundary_reflection(species_A, species_B):
     np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
     np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
 
-    assert sim.nsteps == 1
+    number_steps = 1
+    assert sim.nsteps == number_steps
 
 
 # Testing Histogram class initilization
@@ -298,9 +303,12 @@ def test_Histogram_update():
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
 
 
-def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, species_C):
+def test_MDSimulation_reaction(simulation_reaction):
     initial_num_particles = len(simulation_reaction.particles)
-    assert initial_num_particles == 2  # Two particles before reaction
+    particle_before_reaction = 2
+    assert (
+        initial_num_particles == particle_before_reaction
+    )  # Two particles before reaction
     p1, p2 = simulation_reaction.particles
 
     # Advance the simulation
@@ -308,7 +316,9 @@ def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, specie
     simulation_reaction.advance(dt)
 
     # After advance, particles should have reacted to form a new C particle
-    assert len(simulation_reaction.particles) == initial_num_particles - 2 + 1  # Remove 2, add 1
+    assert (
+        len(simulation_reaction.particles) == initial_num_particles - 2 + 1
+    )  # Remove 2, add 1
     new_p = simulation_reaction.particles[-1]
     assert new_p.species.name == "C"
     expected_pos = 0.5 * (p1.pos + p2.pos)
@@ -316,4 +326,6 @@ def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, specie
 
     np.testing.assert_array_almost_equal(new_p.pos, expected_pos)
     np.testing.assert_array_almost_equal(new_p.vel, expected_vel)
-    assert simulation_reaction.nsteps == 1
+
+    number_steps = 1
+    assert simulation_reaction.nsteps == number_steps
