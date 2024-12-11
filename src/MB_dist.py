@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
+import random
 
 X, Y = 0, 1
 
@@ -43,7 +44,7 @@ class Particle:
 
 
 class MDSimulation:
-    def __init__(self, particles):
+    def __init__(self, particles, reaction_probability):
         """
         Initialize the simulation with A & B identical, circular particles of radius
         r and mass m.
@@ -53,6 +54,7 @@ class MDSimulation:
         self.n = len(particles)
         self.nsteps = 0
         self.reactions = []
+        self.reaction_probability = reaction_probability
 
     def advance(self, dt):
         self.nsteps += 1
@@ -114,7 +116,8 @@ class MDSimulation:
     def resolve_collision(self, p1, p2):
         # if collision between A&B --> C
         if (p1.species.name == "A" and p2.species.name == "B") or (
-            p1.species.name == "B" and p2.species.name == "A"
+            p1.species.name == "B" and p2.species.name == "A" and (
+                random.random() < self.reaction_probability
         ):
             new_pos = 0.5 * (p1.pos + p2.pos)
             m1, m2 = p1.mass, p2.mass
@@ -208,7 +211,7 @@ def get_KE(m, speeds):
     return 0.5 * m * np.sum(speeds**2)
 
 
-def particle_simulator(num_A, num_B, time_step, num_C=0):
+def particle_simulator(num_A, num_B, time_step, reaction_probability, num_C=0):
     # Define two species with different properties
     species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
     species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
@@ -231,7 +234,7 @@ def particle_simulator(num_A, num_B, time_step, num_C=0):
         + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
     )
 
-    sim = MDSimulation(particles)
+    sim = MDSimulation(particles, reaction_probability)
 
     FPS = time_step
     dt = 1 / FPS
