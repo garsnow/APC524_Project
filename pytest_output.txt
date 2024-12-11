@@ -19,13 +19,13 @@ tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision PASSED 
 tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection PASSED [ 76%]
 tests/test_MB_dist_basic.py::test_Histogram_init PASSED                  [ 84%]
 tests/test_MB_dist_basic.py::test_Histogram_update PASSED                [ 92%]
-tests/test_MB_dist_basic.py::test_MDSimulation_reaction PASSED           [100%]
+tests/test_MB_dist_basic.py::test_MDSimulation_reaction FAILED           [100%]
 
 =================================== FAILURES ===================================
 ___________________ test_MDSimulation_advance_with_collision ___________________
 
-simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f28e26de6e0>
-species_A = <src.species_and_particle.Species object at 0x7f28e26deb30>
+simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f6a8d5426e0>
+species_A = <src.species_and_particle.Species object at 0x7f6a8d542b30>
 
     def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
         p1, p2 = simulation_elastic.particles
@@ -41,24 +41,32 @@ species_A = <src.species_and_particle.Species object at 0x7f28e26deb30>
     
         expected_pos_p1 = pos_before + vel_before * dt
         expected_pos_p2 = pos_before_p2 + vel_before_p2 * dt
->       np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+    
+        expected_vel_p1 = vel_before_p2  # [-1.0, 0.0]
+        expected_vel_p2 = vel_before      # [1.0, 0.0]
+    
+        np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
+        np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
+>       np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
 
 dt         = 0.1
-expected_pos_p1 = array([0.3, 0.5])
-expected_pos_p2 = array([0.7, 0.5])
-p1         = <src.species_and_particle.Particle object at 0x7f28e26deb00>
-p2         = <src.species_and_particle.Particle object at 0x7f28e26de7d0>
-pos_before = array([0.2, 0.5])
-pos_before_p2 = array([0.8, 0.5])
-simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f28e26de6e0>
-species_A  = <src.species_and_particle.Species object at 0x7f28e26deb30>
+expected_pos_p1 = array([0.55, 0.5 ])
+expected_pos_p2 = array([0.45, 0.5 ])
+expected_vel_p1 = array([-1.,  0.])
+expected_vel_p2 = array([1., 0.])
+p1         = <src.species_and_particle.Particle object at 0x7f6a8d542b00>
+p2         = <src.species_and_particle.Particle object at 0x7f6a8d5427d0>
+pos_before = array([0.45, 0.5 ])
+pos_before_p2 = array([0.55, 0.5 ])
+simulation_elastic = <src.MB_dist.MDSimulation object at 0x7f6a8d5426e0>
+species_A  = <src.species_and_particle.Species object at 0x7f6a8d542b30>
 vel_before = array([1., 0.])
 vel_before_p2 = array([-1.,  0.])
 
-tests/test_MB_dist_basic.py:151: 
+tests/test_MB_dist_basic.py:157: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-args = (array([0.5, 0.5]), array([0.3, 0.5])), kwargs = {}, old_name = 'y'
+args = (array([1., 0.]), array([-1.,  0.])), kwargs = {}, old_name = 'y'
 new_name = 'desired'
 
     @functools.wraps(fun)
@@ -84,14 +92,14 @@ E       AssertionError:
 E       Arrays are not almost equal to 6 decimals
 E       
 E       Mismatched elements: 1 / 2 (50%)
-E       Max absolute difference among violations: 0.2
-E       Max relative difference among violations: 0.66666667
-E        ACTUAL: array([0.5, 0.5])
-E        DESIRED: array([0.3, 0.5])
+E       Max absolute difference among violations: 2.
+E       Max relative difference among violations: 2.
+E        ACTUAL: array([1., 0.])
+E        DESIRED: array([-1.,  0.])
 
-args       = (array([0.5, 0.5]), array([0.3, 0.5]))
+args       = (array([1., 0.]), array([-1.,  0.]))
 dep_version = '2.0.0'
-fun        = <function assert_array_almost_equal at 0x7f28fd5288b0>
+fun        = <function assert_array_almost_equal at 0x7f6aa89892d0>
 kwargs     = {}
 new_name   = 'desired'
 new_names  = ['actual', 'desired']
@@ -99,6 +107,45 @@ old_name   = 'y'
 old_names  = ['x', 'y']
 
 ../../../.local/lib/python3.10/site-packages/numpy/_utils/__init__.py:85: AssertionError
+__________________________ test_MDSimulation_reaction __________________________
+
+simulation_reaction = <src.MB_dist.MDSimulation object at 0x7f6a8d5bb760>
+species_A = <src.species_and_particle.Species object at 0x7f6a8d5bb8b0>
+species_B = <src.species_and_particle.Species object at 0x7f6a8d5bb7f0>
+species_C = <src.species_and_particle.Species object at 0x7f6a8d5bb7c0>
+
+    def test_MDSimulation_reaction(simulation_reaction, species_A, species_B, species_C):
+        p1, p2 = simulation_reaction.particles
+    
+        pos_before = p1.pos.copy()
+        vel_before = p1.vel.copy()
+        pos_before_p2 = p2.pos.copy()
+        vel_before_p2 = p2.vel.copy()
+    
+        # Advance the simulation
+        dt = 0.1
+        simulation_reaction.advance(dt)
+    
+        # After advance, particles should have reacted to form a new C particle
+>       assert len(simulation_reaction.particles) == 1  # Only species C remains
+E       assert 2 == 1
+E        +  where 2 = len([<src.species_and_particle.Particle object at 0x7f6a8d5bbbe0>, <src.species_and_particle.Particle object at 0x7f6a8d5bb910>])
+E        +    where [<src.species_and_particle.Particle object at 0x7f6a8d5bbbe0>, <src.species_and_particle.Particle object at 0x7f6a8d5bb910>] = <src.MB_dist.MDSimulation object at 0x7f6a8d5bb760>.particles
+
+dt         = 0.1
+p1         = <src.species_and_particle.Particle object at 0x7f6a8d5bbbe0>
+p2         = <src.species_and_particle.Particle object at 0x7f6a8d5bb910>
+pos_before = array([0.2, 0.5])
+pos_before_p2 = array([0.8, 0.5])
+simulation_reaction = <src.MB_dist.MDSimulation object at 0x7f6a8d5bb760>
+species_A  = <src.species_and_particle.Species object at 0x7f6a8d5bb8b0>
+species_B  = <src.species_and_particle.Species object at 0x7f6a8d5bb7f0>
+species_C  = <src.species_and_particle.Species object at 0x7f6a8d5bb7c0>
+vel_before = array([1., 0.])
+vel_before_p2 = array([-1.,  0.])
+
+tests/test_MB_dist_basic.py:247: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision
-========================= 1 failed, 12 passed in 1.14s =========================
+FAILED tests/test_MB_dist_basic.py::test_MDSimulation_reaction - assert 2 == 1
+========================= 2 failed, 11 passed in 0.83s =========================
