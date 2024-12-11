@@ -111,8 +111,6 @@ class MDSimulation:
                 r12_sq = np.dot(r12, r12)
 
             v_rel = np.dot(v12, r12) / r12_sq
-            if v_rel > 0:
-                return
     
             p1.vel = p1.vel - (2 * m2 / ( m1 + m2 )) * v_rel * r12
             p2.vel = p2.vel + (2 * m1 / ( m1 + m2 )) * v_rel * r12
