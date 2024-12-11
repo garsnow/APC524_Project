@@ -168,7 +168,7 @@ def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
 
     np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
     np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
-    assert simulation.nsteps == 1
+    assert simulation_elastic.nsteps == 1
 
 # MDsimulation without collision
 def test_MDSimulation_advance_without_collision(simulation, species_A, species_B):
