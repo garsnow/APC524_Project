@@ -116,7 +116,7 @@ class MDSimulation:
     def resolve_collision(self, p1, p2):
         # if collision between A&B --> C
         if (p1.species.name == "A" and p2.species.name == "B") or (
-            p1.species.name == "B" and p2.species.name == "A" and (
+            p1.species.name == "B" and p2.species.name == "A") and (
                 random.random() < self.reaction_probability
         ):
             new_pos = 0.5 * (p1.pos + p2.pos)
