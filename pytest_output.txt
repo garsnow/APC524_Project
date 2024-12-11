@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-8.3.3, pluggy-1.5.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/blaked/CSE524/Project/APC524_Project
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.6.0
+collecting ... collected 13 items
+
+tests/test_MB_dist_basic.py::test_get_speeds[particles0-expected_speeds0] PASSED [  7%]
+tests/test_MB_dist_basic.py::test_get_speeds[particles1-expected_speeds1] PASSED [ 15%]
+tests/test_MB_dist_basic.py::test_get_speeds[particles2-expected_speeds2] PASSED [ 23%]
+tests/test_MB_dist_basic.py::test_get_speeds[particles3-expected_speeds3] PASSED [ 30%]
+tests/test_MB_dist_basic.py::test_get_speeds_empty PASSED                [ 38%]
+tests/test_MB_dist_basic.py::test_get_KE PASSED                          [ 46%]
+tests/test_MB_dist_basic.py::test_MDSimulation_init PASSED               [ 53%]
+tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision PASSED [ 61%]
+tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision PASSED [ 69%]
+tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection PASSED [ 76%]
+tests/test_MB_dist_basic.py::test_Histogram_init PASSED                  [ 84%]
+tests/test_MB_dist_basic.py::test_Histogram_update PASSED                [ 92%]
+tests/test_MB_dist_basic.py::test_MDSimulation_reaction PASSED           [100%]
+
+============================== 13 passed in 0.76s ==============================

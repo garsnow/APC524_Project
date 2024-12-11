@@ -33,13 +33,17 @@ class MDSimulation:
 
             # Compute distances between all pairs
             pos_array = np.array([p.pos for p in self.particles])
-            dist = squareform(pdist(pos_array))
+            dist_matrix = squareform(pdist(pos_array))
+            
+            # Prevent self collsions by setting diagonal to infinity
+            np.fill_diagonal(dist_matrix, np.inf)
+
             # sum of radii for each pair
             radii = np.array([p.radius for p in self.particles])
             sum_r = np.add.outer(radii, radii)
 
             # Identify collisions (dist <= sum of radii and not zero)
-            iarr, jarr = np.where((dist <= sum_r) & (dist > 0))
+            iarr, jarr = np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
             k = iarr < jarr
             iarr, jarr = iarr[k], jarr[k]
 
@@ -98,29 +102,18 @@ class MDSimulation:
             r12 = p1.pos - p2.pos
             v12 = p1.vel - p2.vel
             r12_sq = np.dot(r12, r12)
-            # Project v12 onto r12
-            factor = np.dot(v12, r12) / r12_sq
+            
+            if r12_sq == 0:
+                separation = p1.radius * 1e-3
+                p1.pos[X] += separation
+                p2.pos[X] -= separation
+                r12 = p1.pos - p2.pos
+                r12_sq = np.dot(r12, r12)
+
+            v_rel = np.dot(v12, r12) / r12_sq
     
-            p1.vel = p1.vel - (2*m2/(m1+m2))*factor*r12
-            p2.vel = p2.vel + (2*m1/(m1+m2))*factor*r12
-
-        # Bounce the particles off the walls where necessary, by reflecting
-        # their velocity vectors.
-        hit_left_wall = self.pos[:, X] < self.r
-        hit_right_wall = self.pos[:, X] > 1 - self.r
-        
-        #adjust positions to be within bounds
-        self.vel[hit_left_wall | hit_right_wall, X] *= -1
-        self.pos[hit_left_wall, self.X] = self.r
-        self.pos[hit_right_wall, self.X] = 1 - self.r
-
-        hit_bottom_wall = self.pos[:, Y] < self.r
-        hit_top_wall = self.pos[:, Y] > 1 - self.r
-
-        self.vel[hit_bottom_wall | hit_top_wall, Y] *= -1
-        self.pos[hit_bottom_wall, self.Y] = self.r
-        self.pos[hit_top_wall, self.Y] = 1 - self.r
-
+            p1.vel = p1.vel - (2 * m2 / ( m1 + m2 )) * v_rel * r12
+            p2.vel = p2.vel + (2 * m1 / ( m1 + m2 )) * v_rel * r12
 
 class Histogram:
     """A class to draw a Matplotlib histogram as a collection of Patches."""
@@ -173,6 +166,8 @@ class Histogram:
 
 def get_speeds(particles):
     """Return the magnitude of the (n,2) array of velocities, vel."""
+    if not particles:
+        return np.array([])
     vel = np.array([p.vel for p in particles])
     return np.hypot(vel[:, X], vel[:, Y])
 
