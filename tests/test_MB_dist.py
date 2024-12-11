@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from scipy.stats import kstest
 from src.MB_dist import MDSimulation, get_speeds
+from src.species_and_particle import Species, Particle
 
 cutoff: float = 0.05
 
@@ -12,22 +13,6 @@ def is_maxwell_boltzmann(speeds: np.ndarray, masses: np.ndarray, T: float) -> bo
     return p_value < cutoff
 
 def setup_simulation():
-    class Species:
-        def __init__(self, name, mass, radius, color):
-            self.name = name
-            self.mass = mass
-            self.radius = radius
-            self.color = color
-
-    class Particle:
-        def __init__(self, species, pos, vel):
-            self.species = species
-            self.pos = np.array(pos)
-            self.vel = np.array(vel)
-            self.mass = species.mass
-            self.radius = species.radius
-            self.color = species.color
-
     num_A = 500
     num_B = 500
     num_C = 500
