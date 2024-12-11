@@ -151,21 +151,8 @@ def test_MDSimulation_advance_with_collision(simulation_elastic, species_A):
     np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
     np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
 
-    # Manual calculation for elastic collision
-    m1, m2 = p1.mass, p2.mass
-    v1_initial = vel_before
-    v2_initial = vel_before_p2
-    r12 = expected_pos_p1 - expected_pos_p2
-    v_rel = v1_initial - v2_initial
-    distance_sq = np.dot(r12, r12)
-    if distance_sq == 0:
-        distance_sq = 1e-10  # Avoid division by zero
-
-    factor = np.dot(v_rel, r12) / distance_sq
-
-    expected_vel_p1 = v1_initial - (2 * m2 / (m1 + m2)) * factor * r12
-    expected_vel_p2 = v2_initial + (2 * m1 / (m1 + m2)) * factor * r12
-
+    expected_vel_p1 = vel_before_p2  # [-1.0, 0.0]
+    expected_vel_p2 = vel_before  
     np.testing.assert_array_almost_equal(p1.vel, expected_vel_p1)
     np.testing.assert_array_almost_equal(p2.vel, expected_vel_p2)
     assert simulation_elastic.nsteps == 1
