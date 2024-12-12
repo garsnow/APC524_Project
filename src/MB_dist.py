@@ -319,14 +319,14 @@ def particle_simulator_initial_steps(
     
     # Validate Matrix_A
     if not (
-        isinstance(Matrix_A, (list, tuple, np.ndarray))
+        isinstance(Matrix_A, list | tuple | np.ndarray)
         and len(Matrix_A) == expected_matrix_length
     ):
         raise ValueError(error_message)
 
     # Similarly validate Matrix_B and Matrix_C
-    for Matrix, name in zip([Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"]):
-        if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == expected_matrix_length):
+    for Matrix, _name in zip([Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"]):
+        if not (isinstance(Matrix, list | tuple | np.ndarray) and len(Matrix) == expected_matrix_length):
             raise ValueError(error_message)
 
     # Extract properties for species A from Matrix_A and B
