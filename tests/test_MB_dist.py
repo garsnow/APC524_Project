@@ -19,7 +19,7 @@ def is_maxwell_boltzmann(
 ) -> bool:
     kb: float = 1.38e-23
 
-    def cdf(v: float) -> bool:
+    def cdf(v: float) -> float:
         return sum(
             [
                 (2 / np.sqrt(np.pi))
