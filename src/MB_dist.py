@@ -1,7 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import cast, Tuple, Optional, List, Union, NDArray
+from typing import cast, Tuple, Optional, List, Union
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
@@ -14,6 +14,7 @@ from matplotlib.collections import PathCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
 import numpy as np
+from numpy.typing import NDArray
 from numpy.random import Generator, default_rng
 from scipy.spatial.distance import pdist, squareform  # type: ignore[import-untyped]
 
@@ -54,8 +55,8 @@ class Particle:
         vel: NDArray[np.float64],
     ) -> None:
         self.species: Species = species
-        self.pos: Position = np.array(pos, dtype=float)
-        self.vel: Velocity = np.array(vel, dtype=float)
+        self.pos: NDArray[np.float64] = np.array(pos, dtype=float)
+        self.vel: NDArray[np.float64] = np.array(vel, dtype=float)
 
     @property
     def mass(self) -> float:
@@ -181,11 +182,11 @@ class MDSimulation:
             (p1.species.name == "A" and p2.species.name == "B")
             or (p1.species.name == "B" and p2.species.name == "A")
         ) and (self.rng.random() < self.reaction_probability):
-            new_pos: Position = 0.5 * (p1.pos + p2.pos)
+            new_pos: NDArray[np.float64] = 0.5 * (p1.pos + p2.pos)
             m1: float = p1.mass
             m2: float = p2.mass
             total_mass: float = m1 + m2
-            new_vel: Velocity = (m1 * p1.vel + m2 * p2.vel) / total_mass
+            new_vel: NDArray[np.float64] = (m1 * p1.vel + m2 * p2.vel) / total_mass
 
             species_C: Species = Species(
                 name="C", mass=3.0, radius=0.03, color="purple"
@@ -199,8 +200,8 @@ class MDSimulation:
         else:
             m1_e: float = p1.mass
             m2_e: float = p2.mass
-            r12: Position = p1.pos - p2.pos
-            v12: Velocity = p1.vel - p2.vel
+            r12: NDArray[np.float64] = p1.pos - p2.pos
+            v12: NDArray[np.float64] = p1.vel - p2.vel
             r12_sq: float = np.dot(r12, r12)
 
             if r12_sq == 0:
