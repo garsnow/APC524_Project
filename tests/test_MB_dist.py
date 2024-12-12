@@ -18,17 +18,17 @@ def is_maxwell_boltzmann(
     speeds: NDArray[np.float64], masses: NDArray[np.float64], T: float
 ) -> bool:
     kb: float = 1.38e-23
-
     def cdf(v: float) -> float:
-        return sum(
-            [
+        total: float = 0.0
+        for m in masses:
+            term: float = (
                 (2 / np.sqrt(np.pi))
                 * (np.sqrt(m / (2 * kb * T)) ** 3)
                 * v**2
                 * np.exp(-m * v**2 / (2 * kb * T))
-                for m in masses
-            ]
-        )
+            )
+            total += term
+        return total
 
     d, p_value = kstest(speeds, cdf)
     return p_value < cutoff
