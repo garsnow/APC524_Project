@@ -110,14 +110,14 @@ class MDSimulation:
             p.pos += p.vel * dt
 
         # Compute distances between all pairs
-        pos_array: NDArray[np.float64] = np.array([p.pos for p in self.particles])
+        pos_array: NDArray[np.float64] = np.array([p.pos for p in self.particles], dtype=np.float64)
         dist_matrix: NDArray[np.float64] = squareform(pdist(pos_array))
 
         # Prevent self collisions by setting diagonal to infinity
         np.fill_diagonal(dist_matrix, np.inf)
 
         # Sum of radii for each pair
-        radii: NDArray[np.float64] = np.array([p.radius for p in self.particles])
+        radii: NDArray[np.float64] = np.array([p.radius for p in self.particles], dtype=np.float64)
         sum_r: NDArray[np.float64] = np.add.outer(radii, radii)
 
         # Identify collisions (dist <= sum of radii and not zero)
@@ -181,11 +181,11 @@ class MDSimulation:
             (p1.species.name == "A" and p2.species.name == "B")
             or (p1.species.name == "B" and p2.species.name == "A")
         ) and (self.rng.random() < self.reaction_probability):
-            new_pos: NDArray[np.float64] = cast(NDArray[np.float64], 0.5 * (p1.pos + p2.pos))
+            new_pos: NDArray[np.float64] = (0.5 * (p1.pos + p2.pos)).astype(np.float64)
             m1: float = p1.mass
             m2: float = p2.mass
             total_mass: float = m1 + m2
-            new_vel: NDArray[np.float64] = cast(NDArray[np.float64], (m1 * p1.vel + m2 * p2.vel) / total_mass)
+            new_vel: NDArray[np.float64] = ((m1 * p1.vel + m2 * p2.vel) / total_mass).astype(np.float64)
 
             species_C: Species = Species(
                 name="C", mass=3.0, radius=0.03, color="purple"
@@ -286,10 +286,9 @@ class Histogram:
         Args:
             data: New data for histogram
         """
-        self.hist, bins = cast(
-            Tuple[NDArray[np.float64], NDArray[np.float64]],
-            np.histogram(data, self.bins, density=self.density)
-        )
+        self.hist, self.bins = np.histogram(data, self.bins, density=self.density)
+        self.hist = self.hist.astype(np.float64)
+        self.bins = self.bins.astype(np.float64)
         self.top = self.bottom + self.hist
         self.verts[1::5, 1] = self.top
         self.verts[2::5, 1] = self.top
@@ -371,9 +370,9 @@ def particle_simulator_initial_steps(
 
     # Create Particle instances
     particles += (
-        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
+        [Particle(species_A, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_C, vel_C)]
     )
     return particles
 
