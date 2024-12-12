@@ -60,4 +60,3 @@ jobs:
           MPLBACKEND: Agg  # Set backend to 'Agg' for headless environments
         run: |
           python -m pytest -ra
-
