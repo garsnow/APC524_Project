@@ -1,14 +1,15 @@
 import numpy as np
-import pytest  # type: ignore
-from scipy.stats import kstest  # type: ignore
+import pytest  # type: ignore[import-untyped]
+from scipy.stats import kstest  # type: ignore[import-untyped]
 from typing import Tuple, cast
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
 
+
 cutoff: float = 0.05
 
 # Initialize the random number generator
-rng = np.random.default_rng()
+rng: Generator = np.random.default_rng()
 
 
 def is_maxwell_boltzmann(
@@ -50,7 +51,7 @@ def setup_simulation() -> Tuple[MDSimulation, float, np.ndarray, float]:
     vel_C: np.ndarray = rng.random((num_C, 2)) - 0.5  # Random velocities
 
     # Create Particle instances with proper type casting
-    particles: list[Particle] = (
+    particles: List[Particle] = (
         [Particle(species_A, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_A, vel_A)]
         + [Particle(species_B, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_B, vel_B)]
         + [Particle(species_C, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_C, vel_C)]
@@ -60,10 +61,12 @@ def setup_simulation() -> Tuple[MDSimulation, float, np.ndarray, float]:
     dt: float = 1 / 30  # Time step
     T: float = 300.0  # Temperature
 
+    masses: np.ndarray = np.array([p.mass for p in particles], dtype=np.float64)
+
     return (
         sim,
         dt,
-        np.array([p.mass for p in particles], dtype=np.float64),
+        masses,
         T,
     )  # Return the simulation, time step, masses, and temperature
 
@@ -90,4 +93,4 @@ def test_basic() -> None:
 
 
 if __name__ == "__main__":
-    pytest.main()  # type: ignore
+    pytest.main()  # type: ignore[import-untyped]
