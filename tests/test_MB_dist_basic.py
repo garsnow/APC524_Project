@@ -1,8 +1,8 @@
 import sys
 from pathlib import Path
-
 import numpy as np
 import pytest
+from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
 # Initialize the random number generator
 rng = np.random.default_rng()
@@ -11,7 +11,6 @@ rng = np.random.default_rng()
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, src_path.resolve())
 
-from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
 X, Y = 0, 1
 
