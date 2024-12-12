@@ -27,8 +27,6 @@ X: int = 0
 Y: int = 1
 
 # static type aliases
-Position = NDArray[np.float64]
-Velocity = NDArray[np.float64]
 SpeciesName = str
 Color = str
 
