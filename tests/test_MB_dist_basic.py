@@ -39,21 +39,21 @@ def species_C() -> Species:
 @pytest.fixture
 def particle_A(species_A: Species) -> Particle:
     pos: NDArray[np.float64] = np.array([0.2, 0.5], dtype=np.float64)
-    vel: NDArray[np.float_] = np.array([1.0, 0.0], dtype=np.float64)
+    vel: NDArray[np.float64] = np.array([1.0, 0.0], dtype=np.float64)
     return Particle(species_A, pos, vel)
 
 
 @pytest.fixture
 def particle_B(species_B: Species) -> Particle:
-    pos: NDArray[np.float_] = np.array([0.8, 0.5], dtype=np.float64)
-    vel: NDArray[np.float_] = np.array([-1.0, 0.0], dtype=np.float64)
+    pos: NDArray[np.float64] = np.array([0.8, 0.5], dtype=np.float64)
+    vel: NDArray[np.float64] = np.array([-1.0, 0.0], dtype=np.float64)
     return Particle(species_B, pos, vel)
 
 
 @pytest.fixture
 def particle_C(species_C: Species) -> Particle:
-    pos: NDArray[np.float_] = np.array([0.5, 0.5], dtype=np.float64)
-    vel: NDArray[np.float_] = np.array([0.0, 0.0], dtype=np.float64)
+    pos: NDArray[np.float64] = np.array([0.5, 0.5], dtype=np.float64)
+    vel: NDArray[np.float64] = np.array([0.0, 0.0], dtype=np.float64)
     return Particle(species_C, pos, vel)
 
 
