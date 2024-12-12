@@ -1,5 +1,5 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-import matplotlib
+import mpl
 
 matplotlib.use("TkAgg")
 import random
@@ -224,21 +224,24 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     - reaction_probability: Probability of reaction upon collision
     - num_C: Number of initial particles for species C (default is 0)
     """
-
+    expected_matrix_length = 3
+    error_message = "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
     # Validate Matrix_A
-    if not (isinstance(Matrix_A, (list, tuple, np.ndarray)) and len(Matrix_A) == 3):
-        raise ValueError(
-            "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
-        )
+    if not (
+        isinstance(Matrix_A, list | tuple | np.ndarray)
+        and len(Matrix_A) == expected_matrix_length
+    ):
+        raise ValueError(error_message)
 
     # Similarly validate Matrix_B and Matrix_C
     for Matrix, name in zip(
         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
     ):
-        if not (isinstance(Matrix, (list, tuple, np.ndarray)) and len(Matrix) == 3):
-            raise ValueError(
-                f"{name} must be a list, tuple, or NumPy array with three elements: [num, mass, radius]"
-            )
+        if not (
+            isinstance(Matrix, (list, tuple, np.ndarray))
+            and len(Matrix) == expected_matrix_length
+        ):
+            raise ValueError(error_message)
 
     # Extract properties for species A from Matrix_A and B
     num_A, mass_A, radius_A = Matrix_A
@@ -259,14 +262,14 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
-    pos_A = np.random.rand(int(num_A), 2) * 0.4 + 0.05  # left side
-    vel_A = np.random.rand(int(num_A), 2) - 0.5
+    pos_A = np.random.Generator(int(num_A), 2) * 0.4 + 0.05  # left side
+    vel_A = np.random.Generator(int(num_A), 2) - 0.5
 
-    pos_B = np.random.rand(int(num_B), 2) * 0.4 + 0.55  # right side
-    vel_B = np.random.rand(int(num_B), 2) - 0.5
+    pos_B = np.random.Generator(int(num_B), 2) * 0.4 + 0.55  # right side
+    vel_B = np.random.Generator(int(num_B), 2) - 0.5
 
-    pos_C = np.random.rand(int(num_C), 2) * 0.4 + 0.3  # middle
-    vel_C = np.random.rand(int(num_C), 2) - 0.5
+    pos_C = np.random.Generator(int(num_C), 2) * 0.4 + 0.3  # middle
+    vel_C = np.random.Generator(int(num_C), 2) - 0.5
 
     particles = (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]

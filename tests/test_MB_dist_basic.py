@@ -9,7 +9,7 @@ rng = np.random.default_rng()
 
 # Add 'src/' directory to sys.path
 src_path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, src_path.resolve())  # noqa: E402
+sys.path.insert(0, src_path.resolve())
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
