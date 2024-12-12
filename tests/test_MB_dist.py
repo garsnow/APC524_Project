@@ -29,7 +29,8 @@ def is_maxwell_boltzmann(
             )
             total += term
         return total
-
+    d: float
+    p_value: float
     d, p_value = kstest(speeds, cdf)
     return p_value < cutoff
 
