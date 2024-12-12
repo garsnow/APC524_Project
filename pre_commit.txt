@@ -1,0 +1,50 @@
+check for added large files..............................................[42mPassed[m
+check for case conflicts.................................................[42mPassed[m
+check for merge conflicts................................................[42mPassed[m
+check for broken symlinks............................(no files to check)[46;30mSkipped[m
+check yaml...............................................................[42mPassed[m
+debug statements (python)................................................[42mPassed[m
+fix end of files.........................................................[42mPassed[m
+mixed line ending........................................................[42mPassed[m
+fix requirements.txt.................................(no files to check)[46;30mSkipped[m
+trim trailing whitespace.................................................[42mPassed[m
+ruff.....................................................................[41mFailed[m
+[2m- hook id: ruff[m
+[2m- exit code: 1[m
+
+[1msrc/MB_dist.py[0m[36m:[0m323[36m:[0m9[36m:[0m [1;31mUP038[0m Use `X | Y` in `isinstance` call instead of `(X, Y)`
+[1;38;5;12m    |[0m
+[1;38;5;12m321 |[0m     # Validate Matrix_A
+[1;38;5;12m322 |[0m     if not (
+[1;38;5;12m323 |[0m         isinstance(Matrix_A, (list, tuple, np.ndarray))
+[1;38;5;12m    |[0m[1;38;5;9m         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mUP038[0m
+[1;38;5;12m324 |[0m         and len(Matrix_A) == expected_matrix_length
+[1;38;5;12m325 |[0m     ):
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Convert to `X | Y`
+
+[1msrc/MB_dist.py[0m[36m:[0m329[36m:[0m17[36m:[0m [1;31mB007[0m Loop control variable `name` not used within loop body
+[1;38;5;12m    |[0m
+[1;38;5;12m328 |[0m     # Similarly validate Matrix_B and Matrix_C
+[1;38;5;12m329 |[0m     for Matrix, name in zip(
+[1;38;5;12m    |[0m[1;38;5;9m                 ^^^^[0m [1;38;5;9mB007[0m
+[1;38;5;12m330 |[0m         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
+[1;38;5;12m331 |[0m     ):
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Rename unused `name` to `_name`
+
+[1msrc/MB_dist.py[0m[36m:[0m333[36m:[0m13[36m:[0m [1;31mUP038[0m Use `X | Y` in `isinstance` call instead of `(X, Y)`
+[1;38;5;12m    |[0m
+[1;38;5;12m331 |[0m     ):
+[1;38;5;12m332 |[0m         if not (
+[1;38;5;12m333 |[0m             isinstance(Matrix, (list, tuple, np.ndarray))
+[1;38;5;12m    |[0m[1;38;5;9m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mUP038[0m
+[1;38;5;12m334 |[0m             and len(Matrix) == expected_matrix_length
+[1;38;5;12m335 |[0m         ):
+[1;38;5;12m    |[0m
+    [1;38;5;12m=[0m [1;38;5;14mhelp[0m: Convert to `X | Y`
+
+Found 3 errors.
+No fixes available (3 hidden fixes can be enabled with the `--unsafe-fixes` option).
+
+ruff-format..............................................................[42mPassed[m
