@@ -53,8 +53,8 @@ class Particle:
         vel: NDArray[np.float64],
     ) -> None:
         self.species: Species = species
-        self.pos: NDArray[np.float64] = np.array(pos, dtype=float)
-        self.vel: NDArray[np.float64] = np.array(vel, dtype=float)
+        self.pos: NDArray[np.float64] = np.array(pos, dtype=float64)
+        self.vel: NDArray[np.float64] = np.array(vel, dtype=float64)
 
     @property
     def mass(self) -> float:
@@ -180,11 +180,11 @@ class MDSimulation:
             (p1.species.name == "A" and p2.species.name == "B")
             or (p1.species.name == "B" and p2.species.name == "A")
         ) and (self.rng.random() < self.reaction_probability):
-            new_pos: NDArray[np.float64] = 0.5 * (p1.pos + p2.pos)
+            new_pos: NDArray[np.float64] = cast(NDArray[np.float64], 0.5 * (p1.pos + p2.pos))
             m1: float = p1.mass
             m2: float = p2.mass
             total_mass: float = m1 + m2
-            new_vel: NDArray[np.float64] = (m1 * p1.vel + m2 * p2.vel) / total_mass
+            new_vel: NDArray[np.float64] = cast(NDArray[np.float64], (m1 * p1.vel + m2 * p2.vel) / total_mass)
 
             species_C: Species = Species(
                 name="C", mass=3.0, radius=0.03, color="purple"
@@ -198,8 +198,8 @@ class MDSimulation:
         else:
             m1_e: float = p1.mass
             m2_e: float = p2.mass
-            r12: NDArray[np.float64] = p1.pos - p2.pos
-            v12: NDArray[np.float64] = p1.vel - p2.vel
+            r12: NDArray[np.float64] = cast(NDArray[np.float64], p1.pos - p2.pos)
+            v12: NDArray[np.float64] = cast(NDArray[np.float64], p1.vel - p2.vel)
             r12_sq: float = np.dot(r12, r12)
 
             if r12_sq == 0:
@@ -238,7 +238,7 @@ class Histogram:
         self.density: bool = density
         self.bins: NDArray[np.float64] = np.linspace(0, xmax, nbars)
         self.hist: NDArray[np.float64]
-        self.hist, bins = self.hist, bins = cast(
+        self.hist, bins = cast(
             Tuple[NDArray[np.float64], NDArray[np.float64]],
             np.histogram(data, self.bins, density=density)
         )
@@ -285,9 +285,9 @@ class Histogram:
         Args:
             data: New data for histogram
         """
-        self.hist, bins = self.hist, bins = cast(
+        self.hist, bins = cast(
             Tuple[NDArray[np.float64], NDArray[np.float64]],
-            np.histogram(data, self.bins, density=density)
+            np.histogram(data, self.bins, density=self.density)
         )
         self.top = self.bottom + self.hist
         self.verts[1::5, 1] = self.top
@@ -426,7 +426,7 @@ def setup_plot(
     masses: list[float] = [p.mass for p in sim.particles]
     m: float = np.mean(masses)
     speeds: NDArray[np.float64] = get_speeds(sim.particles)
-    mean_KE: float = get_KE(m, speeds) / sim.n
+    mean_KE: float = float(get_KE(m, speeds) / sim.n(
     a: float = m / (2 * mean_KE)
 
     speed_ax: Axes = fig.add_subplot(122)
