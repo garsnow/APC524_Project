@@ -47,6 +47,7 @@ jobs:
           pip install numpy
           pip install matplotlib
           pip install scipy
+          pip install types-pytest
 
       - name: Run mypy
         run: mypy src/MB_dist.py tests/test_MB_dist.py tests/test_MB_dist_basic.py
@@ -79,6 +80,7 @@ jobs:
           pip install numpy
           pip install matplotlib
           pip install scipy
+          pip install types-pytest
 
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
