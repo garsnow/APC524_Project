@@ -53,8 +53,8 @@ class Particle:
         vel: NDArray[np.float64],
     ) -> None:
         self.species: Species = species
-        self.pos: NDArray[np.float64] = np.array(pos, dtype=np.float64)
-        self.vel: NDArray[np.float64] = np.array(vel, dtype=np.float64)
+        self.pos: NDArray[np.float64] = pos
+        self.vel: NDArray[np.float64] = vel
 
     @property
     def mass(self) -> float:
@@ -111,14 +111,14 @@ class MDSimulation:
 
         # Compute distances between all pairs
         pos_array: NDArray[np.float64] = np.array([p.pos for p in self.particles], dtype=np.float64)
-        dist_matrix: NDArray[np.float64] = squareform(pdist(pos_array))
+        dist_matrix: NDArray[np.float64] = squareform(pdist(pos_array)).astype(np.float64)
 
         # Prevent self collisions by setting diagonal to infinity
         np.fill_diagonal(dist_matrix, np.inf)
 
         # Sum of radii for each pair
         radii: NDArray[np.float64] = np.array([p.radius for p in self.particles], dtype=np.float64)
-        sum_r: NDArray[np.float64] = np.add.outer(radii, radii)
+        sum_r: NDArray[np.float64] = np.add.outer(radii, radii).astype(np.float64)
 
         # Identify collisions (dist <= sum of radii and not zero)
         collisions: Tuple[NDArray[np.intp], NDArray[np.intp]] = cast(
@@ -126,8 +126,8 @@ class MDSimulation:
             np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
         )
 
-        iarr: NDArray[np.intp] = collisions[0]
-        jarr: NDArray[np.intp] = collisions[1]
+        iarr: NDArray[np.intp] = collisions_raw[0].astype(np.intp)
+        jarr: NDArray[np.intp] = collisions_raw[1].astype(np.intp)
 
         # Ensure each pair is processed only once
         k: NDArray[np.bool_] = iarr < jarr
@@ -237,12 +237,11 @@ class Histogram:
         """
         self.nbars: int = nbars
         self.density: bool = density
-        self.bins: NDArray[np.float64] = np.linspace(0, xmax, nbars)
+        self.bins: NDArray[np.float64] = np.linspace(0, xmax, nbars, dtype=np.float64)
         self.hist: NDArray[np.float64]
-        self.hist, bins = cast(
-            Tuple[NDArray[np.float64], NDArray[np.float64]],
-            np.histogram(data, self.bins, density=density)
-        )
+        self.hist, self.bins = np.histogram(data, self.bins, density=density)
+        self.hist: NDArray[np.float64] = self.hist.astype(np.float64)
+        self.bins: NDArray[np.float64] = self.bins.astype(np.float64)
 
         # Drawing the histogram with Matplotlib patches owes a lot to
         # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
@@ -460,7 +459,7 @@ def setup_plot(
     f: NDArray[np.float64] = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
     mb_line: Line2D = speed_ax.plot(sgrid_hi, f, c="0.7")[0]
 
-    fmax: float = np.sqrt(m / mean_KE / np.e)
+    fmax: float = float(np.sqrt(m / mean_KE / np.e))
     speed_ax.set_ylim(0, fmax)
 
     # For the distribution derived by averaging, take the abscissa speed points from the centre of the histogram bars.
