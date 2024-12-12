@@ -53,8 +53,8 @@ class Particle:
         vel: NDArray[np.float64],
     ) -> None:
         self.species: Species = species
-        self.pos: NDArray[np.float64] = np.array(pos, dtype=float64)
-        self.vel: NDArray[np.float64] = np.array(vel, dtype=float64)
+        self.pos: NDArray[np.float64] = np.array(pos, dtype=np.float64)
+        self.vel: NDArray[np.float64] = np.array(vel, dtype=np.float64)
 
     @property
     def mass(self) -> float:
@@ -121,8 +121,9 @@ class MDSimulation:
         sum_r: NDArray[np.float64] = np.add.outer(radii, radii)
 
         # Identify collisions (dist <= sum of radii and not zero)
-        collisions: Tuple[NDArray[np.intp], NDArray[np.intp]] = np.where(
-            (dist_matrix <= sum_r) & (dist_matrix > 0)
+        collisions: Tuple[NDArray[np.intp], NDArray[np.intp]] = cast(
+            Tuple[NDArray[np.intp], NDArray[np.intp]],
+            np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
         )
 
         iarr: NDArray[np.intp] = collisions[0]
