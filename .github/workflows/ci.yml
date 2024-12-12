@@ -56,4 +56,8 @@ jobs:
         run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
 
       - name: Test package
-        run: python -m pytest -ra
+        env:
+          MPLBACKEND: Agg  # Set backend to 'Agg' for headless environments
+        run: |
+          python -m pytest -ra
+        
