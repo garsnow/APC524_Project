@@ -1,24 +1,82 @@
 ============================= test session starts ==============================
-platform linux -- Python 3.10.12, pytest-8.3.3, pluggy-1.5.0 -- /usr/bin/python3
-cachedir: .pytest_cache
+platform linux -- Python 3.10.12, pytest-8.3.3, pluggy-1.5.0
 rootdir: /home/blaked/CSE524/Project/APC524_Project
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.6.0
-collecting ... collected 13 items
+collected 0 items / 2 errors
 
-tests/test_MB_dist_basic.py::test_get_speeds[particles0-expected_speeds0] PASSED [  7%]
-tests/test_MB_dist_basic.py::test_get_speeds[particles1-expected_speeds1] PASSED [ 15%]
-tests/test_MB_dist_basic.py::test_get_speeds[particles2-expected_speeds2] PASSED [ 23%]
-tests/test_MB_dist_basic.py::test_get_speeds[particles3-expected_speeds3] PASSED [ 30%]
-tests/test_MB_dist_basic.py::test_get_speeds_empty PASSED                [ 38%]
-tests/test_MB_dist_basic.py::test_get_KE PASSED                          [ 46%]
-tests/test_MB_dist_basic.py::test_MDSimulation_init PASSED               [ 53%]
-tests/test_MB_dist_basic.py::test_MDSimulation_advance_with_collision PASSED [ 61%]
-tests/test_MB_dist_basic.py::test_MDSimulation_advance_without_collision PASSED [ 69%]
-tests/test_MB_dist_basic.py::test_MDSimulation_boundary_reflection PASSED [ 76%]
-tests/test_MB_dist_basic.py::test_Histogram_init PASSED                  [ 84%]
-tests/test_MB_dist_basic.py::test_Histogram_update PASSED                [ 92%]
-tests/test_MB_dist_basic.py::test_MDSimulation_reaction PASSED           [100%]
-
-============================== 13 passed in 0.76s ==============================
+==================================== ERRORS ====================================
+____________________ ERROR collecting tests/test_MB_dist.py ____________________
+tests/test_MB_dist.py:5: in <module>
+    from src.MB_dist import MDSimulation, Particle, Species, get_speeds
+        __annotations__ = {}
+        __builtins__ = <builtins>
+        __cached__ = '/home/blaked/CSE524/Project/APC524_Project/tests/__pycache__/test_MB_dist.cpython-310.pyc'
+        __doc__    = None
+        __file__   = '/home/blaked/CSE524/Project/APC524_Project/tests/test_MB_dist.py'
+        __loader__ = <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x7fb966e0e710>
+        __name__   = 'tests.test_MB_dist'
+        __package__ = 'tests'
+        __spec__   = ModuleSpec(name='tests.test_MB_dist', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x7fb966e0e710>, origin='/home/blaked/CSE524/Project/APC524_Project/tests/test_MB_dist.py')
+        kstest     = <function kstest at 0x7fb936b67d00>
+        np         = <module 'numpy' from '/home/blaked/.local/lib/python3.10/site-packages/numpy/__init__.py'>
+        pytest     = <module 'pytest' from '/home/blaked/.local/lib/python3.10/site-packages/pytest/__init__.py'>
+src/MB_dist.py:10: in <module>
+    plt.use("TkAgg")
+E   AttributeError: module 'matplotlib.pyplot' has no attribute 'use'
+        FuncAnimation = <class 'matplotlib.animation.FuncAnimation'>
+        __builtins__ = <builtins>
+        __cached__ = '/home/blaked/CSE524/Project/APC524_Project/src/__pycache__/MB_dist.cpython-310.pyc'
+        __doc__    = None
+        __file__   = '/home/blaked/CSE524/Project/APC524_Project/src/MB_dist.py'
+        __loader__ = <_frozen_importlib_external.SourceFileLoader object at 0x7fb93642bca0>
+        __name__   = 'src.MB_dist'
+        __package__ = 'src'
+        __spec__   = ModuleSpec(name='src.MB_dist', loader=<_frozen_importlib_external.SourceFileLoader object at 0x7fb93642bca0>, origin='/home/blaked/CSE524/Project/APC524_Project/src/MB_dist.py')
+        np         = <module 'numpy' from '/home/blaked/.local/lib/python3.10/site-packages/numpy/__init__.py'>
+        patches    = <module 'matplotlib.patches' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/patches.py'>
+        path       = <module 'matplotlib.path' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/path.py'>
+        pdist      = <function pdist at 0x7fb9381f05e0>
+        plt        = <module 'matplotlib.pyplot' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/pyplot.py'>
+        random     = <module 'random' from '/usr/lib/python3.10/random.py'>
+        squareform = <function squareform at 0x7fb9381f12d0>
+_________________ ERROR collecting tests/test_MB_dist_basic.py _________________
+tests/test_MB_dist_basic.py:7: in <module>
+    from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
+        Path       = <class 'pathlib.Path'>
+        __builtins__ = <builtins>
+        __cached__ = '/home/blaked/CSE524/Project/APC524_Project/tests/__pycache__/test_MB_dist_basic.cpython-310.pyc'
+        __doc__    = None
+        __file__   = '/home/blaked/CSE524/Project/APC524_Project/tests/test_MB_dist_basic.py'
+        __loader__ = <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x7fb966e0e710>
+        __name__   = 'tests.test_MB_dist_basic'
+        __package__ = 'tests'
+        __spec__   = ModuleSpec(name='tests.test_MB_dist_basic', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x7fb966e0e710>, origin='/home/blaked/CSE524/Project/APC524_Project/tests/test_MB_dist_basic.py')
+        np         = <module 'numpy' from '/home/blaked/.local/lib/python3.10/site-packages/numpy/__init__.py'>
+        pytest     = <module 'pytest' from '/home/blaked/.local/lib/python3.10/site-packages/pytest/__init__.py'>
+        sys        = <module 'sys' (built-in)>
+src/MB_dist.py:10: in <module>
+    plt.use("TkAgg")
+E   AttributeError: module 'matplotlib.pyplot' has no attribute 'use'
+        FuncAnimation = <class 'matplotlib.animation.FuncAnimation'>
+        __builtins__ = <builtins>
+        __cached__ = '/home/blaked/CSE524/Project/APC524_Project/src/__pycache__/MB_dist.cpython-310.pyc'
+        __doc__    = None
+        __file__   = '/home/blaked/CSE524/Project/APC524_Project/src/MB_dist.py'
+        __loader__ = <_frozen_importlib_external.SourceFileLoader object at 0x7fb934c65120>
+        __name__   = 'src.MB_dist'
+        __package__ = 'src'
+        __spec__   = ModuleSpec(name='src.MB_dist', loader=<_frozen_importlib_external.SourceFileLoader object at 0x7fb934c65120>, origin='/home/blaked/CSE524/Project/APC524_Project/src/MB_dist.py')
+        np         = <module 'numpy' from '/home/blaked/.local/lib/python3.10/site-packages/numpy/__init__.py'>
+        patches    = <module 'matplotlib.patches' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/patches.py'>
+        path       = <module 'matplotlib.path' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/path.py'>
+        pdist      = <function pdist at 0x7fb9381f05e0>
+        plt        = <module 'matplotlib.pyplot' from '/home/blaked/.local/lib/python3.10/site-packages/matplotlib/pyplot.py'>
+        random     = <module 'random' from '/usr/lib/python3.10/random.py'>
+        squareform = <function squareform at 0x7fb9381f12d0>
+=========================== short test summary info ============================
+ERROR tests/test_MB_dist.py - AttributeError: module 'matplotlib.pyplot' has ...
+ERROR tests/test_MB_dist_basic.py - AttributeError: module 'matplotlib.pyplot...
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+============================== 2 errors in 1.82s ===============================
