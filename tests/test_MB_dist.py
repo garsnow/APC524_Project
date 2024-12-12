@@ -43,14 +43,14 @@ def setup_simulation() -> Tuple[MDSimulation, float, NDArray[np.float64], float]
     species_B: Species = Species(name="B", mass=2.0, radius=0.02, color="blue")
     species_C: Species = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
-    pos_A: NDArray[np.float64] = rng.random((num_A, 2))  # Random positions
-    vel_A: NDArray[np.float64] = rng.random((num_A, 2)) - 0.5  # Random velocities
+    pos_A: NDArray[np.float64] = cast(rng.random((num_A, 2)))  # Random positions
+    vel_A: NDArray[np.float64] = cast(rng.random((num_A, 2)) - 0.5)  # Random velocities
 
-    pos_B: NDArray[np.float64] = rng.random((num_B, 2))  # Random positions
-    vel_B: NDArray[np.float64] = rng.random((num_B, 2)) - 0.5  # Random velocities
+    pos_B: NDArray[np.float64] = cast(rng.random((num_B, 2)))  # Random positions
+    vel_B: NDArray[np.float64] = cast(rng.random((num_B, 2)) - 0.5)  # Random velocities
 
-    pos_C: NDArray[np.float64] = rng.random((num_C, 2))  # Random positions
-    vel_C: NDArray[np.float64] = rng.random((num_C, 2)) - 0.5  # Random velocities
+    pos_C: NDArray[np.float64] = cast(rng.random((num_C, 2)))  # Random positions
+    vel_C: NDArray[np.float64] = cast(rng.random((num_C, 2)) - 0.5)  # Random velocities
 
     # Create Particle instances with proper type casting
     particles: List[Particle] = (
