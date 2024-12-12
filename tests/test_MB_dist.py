@@ -2,7 +2,7 @@ import numpy as np
 import pytest  # type: ignore[import-untyped]
 from scipy.stats import kstest  # type: ignore[import-untyped]
 from typing import List, Tuple, cast
-from np.typing import NDArray
+from numpy.typing import NDArray
 from numpy.random import Generator, default_rng
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
@@ -95,4 +95,4 @@ def test_basic() -> None:
 
 
 if __name__ == "__main__":
-    pytest.main()  # type: ignore[import-untyped]
+    pytest.main()
