@@ -4,11 +4,7 @@ from typing import List, Tuple, Optional, cast
 
 import numpy as np
 from numpy.random import Generator, default_rng
-import pytest  # type: ignore[import-untyped]
-
-# Add 'src/' directory to sys.path
-src_path: Path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, str(src_path.resolve()))
+import pytest  # type: ignore
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 from numpy.typing import NDArray
