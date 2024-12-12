@@ -426,7 +426,7 @@ def setup_plot(
     masses: list[float] = [p.mass for p in sim.particles]
     m: float = np.mean(masses)
     speeds: NDArray[np.float64] = get_speeds(sim.particles)
-    mean_KE: float = float(get_KE(m, speeds) / sim.n(
+    mean_KE: float = float(get_KE(m, speeds) / sim.n)
     a: float = m / (2 * mean_KE)
 
     speed_ax: Axes = fig.add_subplot(122)
