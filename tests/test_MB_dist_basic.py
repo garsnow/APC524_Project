@@ -6,15 +6,16 @@ import numpy as np
 from numpy.random import Generator, default_rng
 import pytest  # type: ignore[import-untyped]
 
+# Add 'src/' directory to sys.path
+src_path: Path = Path(__file__).parent.parent / "src"
+sys.path.insert(0, src_path.resolve())
+
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 from numpy.typing import NDArray
 
 # Initialize the random number generator
 rng: Generator = np.random.default_rng()
 
-# Add 'src/' directory to sys.path
-src_path: Path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, src_path.resolve())
 
 X: int = 0
 Y: int = 1
