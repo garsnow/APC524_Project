@@ -1,7 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import cast, Tuple, Optional
+from typing import cast, Tuple, Optional, List, Union, NDArray
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
@@ -15,8 +15,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
 import numpy as np
 from numpy.random import Generator, default_rng
-from numpy.typing import NDArray
-from scipy.spatial.distance import pdist, squareform  # type: ignore
+from scipy.spatial.distance import pdist, squareform  # type: ignore[import-untyped]
 
 # Set Matplotlib backend based on environment variable or default to 'TkAgg'
 mpl_backend: str = os.getenv("MPLBACKEND", "TkAgg")
