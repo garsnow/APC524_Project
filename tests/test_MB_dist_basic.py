@@ -309,8 +309,8 @@ def test_Histogram_update() -> None:
     hist_obj.update(data_new)
 
     expected_hist, expected_bins = np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
-    expected_hist = cast(NDArray[np.float64], expected_hist)
-    expected_bins = cast(NDArray[np.float64], expected_bins)
+    expected_hist = expected_hist.astype(np.float64)
+    expected_bins = expected_bins.astype(np.float64)
     
     assert np.array_equal(hist_obj.hist, expected_hist)
     expected_top: NDArray[np.float64] = np.zeros(len(expected_hist), dtype=np.float64) + expected_hist
