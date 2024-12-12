@@ -1,14 +1,12 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import mpl
-
-matplotlib.use("TkAgg")
 import random
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
+matplotlib.use("TkAgg")
 
 X, Y = 0, 1
 
@@ -212,18 +210,7 @@ def get_KE(m, speeds):
     """Return the total kinetic energy of all particles in scaled units."""
     return 0.5 * m * np.sum(speeds**2)
 
-
-def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
-    """
-    Initialize and run the molecular dynamics simulation.
-
-    Parameters:
-    - Matrix_A: List or NumPy array containing [num_A, mass_A, radius_A]
-    - num_B: Number of particles for species B
-    - time_step: Frames per second (FPS)
-    - reaction_probability: Probability of reaction upon collision
-    - num_C: Number of initial particles for species C (default is 0)
-    """
+def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C)
     expected_matrix_length = 3
     error_message = "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
     # Validate Matrix_A
@@ -234,7 +221,7 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
         raise ValueError(error_message)
 
     # Similarly validate Matrix_B and Matrix_C
-    for Matrix, name in zip(
+    for Matrix, _name in zip(
         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
     ):
         if not (
@@ -253,13 +240,6 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     species_B = Species(name="B", mass=mass_B, radius=radius_B, color="blue")
     species_C = Species(name="C", mass=mass_C, radius=radius_C, color="purple")
 
-    # initializes counters for time, and number of A,B,C
-    # used to create concentration vs time profiles
-    time_steps = []
-    count_A = []
-    count_B = []
-    count_C = []
-
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
     pos_A = np.random.Generator(int(num_A), 2) * 0.4 + 0.05  # left side
@@ -270,17 +250,36 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
 
     pos_C = np.random.Generator(int(num_C), 2) * 0.4 + 0.3  # middle
     vel_C = np.random.Generator(int(num_C), 2) - 0.5
-
+        
     particles = (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
         + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
         + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
     )
+    return particles
+def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
+    """
+    Initialize and run the molecular dynamics simulation.
 
+    Parameters:
+    - Matrix_A: List or NumPy array containing [num_A, mass_A, radius_A]
+    - num_B: Number of particles for species B
+    - time_step: Frames per second (FPS)
+    - reaction_probability: Probability of reaction upon collision
+    - num_C: Number of initial particles for species C (default is 0)
+    """
+    particles = particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C)
     sim = MDSimulation(particles, reaction_probability)
 
     dt = 1 / FPS
 
+    # initializes counters for time, and number of A,B,C
+    # used to create concentration vs time profiles
+    time_steps = []
+    count_A = []
+    count_B = []
+    count_C = []
+    
     # Set up plotting
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xlim(0, 1)
