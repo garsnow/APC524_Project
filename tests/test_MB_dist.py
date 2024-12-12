@@ -1,6 +1,7 @@
 import numpy as np
-import pytest
-from scipy.stats import kstest
+import pytest  # type: ignore
+from scipy.stats import kstest  # type: ignore
+from typing import Tuple, cast
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
 
@@ -10,7 +11,9 @@ cutoff: float = 0.05
 rng = np.random.default_rng()
 
 
-def is_maxwell_boltzmann(speeds: np.ndarray, masses: np.ndarray, T: float) -> bool:
+def is_maxwell_boltzmann(
+    speeds: np.ndarray, masses: np.ndarray, T: float
+) -> bool:
     kb: float = 1.38e-23
 
     def cdf(v: float) -> float:
@@ -28,50 +31,53 @@ def is_maxwell_boltzmann(speeds: np.ndarray, masses: np.ndarray, T: float) -> bo
     return p_value < cutoff
 
 
-def setup_simulation():
-    num_A = 500
-    num_B = 500
-    num_C = 500
-    reaction_probability = 1.0
-    species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
-    species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
-    species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
+def setup_simulation() -> Tuple[MDSimulation, float, np.ndarray, float]:
+    num_A: int = 500
+    num_B: int = 500
+    num_C: int = 500
+    reaction_probability: float = 1.0
+    species_A: Species = Species(name="A", mass=1.0, radius=0.01, color="red")
+    species_B: Species = Species(name="B", mass=2.0, radius=0.02, color="blue")
+    species_C: Species = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
-    pos_A = rng.random((num_A, 2))  # Random positions
-    vel_A = rng.random((num_A, 2)) - 0.5  # Random velocities
+    pos_A: np.ndarray = rng.random((num_A, 2))  # Random positions
+    vel_A: np.ndarray = rng.random((num_A, 2)) - 0.5  # Random velocities
 
-    pos_B = rng.random((num_B, 2))  # Random positions
-    vel_B = rng.random((num_B, 2)) - 0.5  # Random velocities
+    pos_B: np.ndarray = rng.random((num_B, 2))  # Random positions
+    vel_B: np.ndarray = rng.random((num_B, 2)) - 0.5  # Random velocities
 
-    pos_C = rng.random((num_C, 2))  # Random positions
-    vel_C = rng.random((num_C, 2)) - 0.5  # Random velocities
+    pos_C: np.ndarray = rng.random((num_C, 2))  # Random positions
+    vel_C: np.ndarray = rng.random((num_C, 2)) - 0.5  # Random velocities
 
-    particles = (
-        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
-        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
-        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
+    # Create Particle instances with proper type casting
+    particles: list[Particle] = (
+        [Particle(species_A, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_C, vel_C)]
     )
 
-    sim = MDSimulation(particles, reaction_probability)
-    dt = 1 / 30  # Time step
+    sim: MDSimulation = MDSimulation(particles, reaction_probability)
+    dt: float = 1 / 30  # Time step
+    T: float = 300.0  # Temperature
+
     return (
         sim,
         dt,
-        np.array([p.mass for p in particles]),
-        300,
+        np.array([p.mass for p in particles], dtype=np.float64),
+        T,
     )  # Return the simulation, time step, masses, and temperature
 
 
-def test_MB():
+def test_MB() -> None:
     sim, dt, masses, T = setup_simulation()
 
     # Run the simulation for a sufficient number of steps to reach equilibrium
-    num_steps = 1000
+    num_steps: int = 1000
     for _ in range(num_steps):
         sim.advance(dt)
 
     # Extract the final speeds from the simulation
-    final_speeds = get_speeds(sim.particles)
+    final_speeds: np.ndarray = get_speeds(sim.particles)
 
     # Check if the final speeds distribution follows the Maxwell-Boltzmann distribution
     assert is_maxwell_boltzmann(
@@ -79,9 +85,9 @@ def test_MB():
     ), "Final speed distribution does not match Maxwell-Boltzmann distribution"
 
 
-def test_basic():
+def test_basic() -> None:
     assert True
 
 
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main()  # type: ignore
