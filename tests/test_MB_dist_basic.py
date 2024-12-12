@@ -23,7 +23,7 @@ Y: int = 1
 
 @pytest.fixture
 def species_A() -> Species:
-    return cast(Species(name="A", mass=1.0, radius=0.05, color="red"))
+    return Species(name="A", mass=1.0, radius=0.05, color="red")
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def species_C() -> Species:
 
 @pytest.fixture
 def particle_A(species_A: Species) -> Particle:
-    pos: NDArray[np.float_] = np.array([0.2, 0.5], dtype=np.float64)
+    pos: NDArray[np.float64] = np.array([0.2, 0.5], dtype=np.float64)
     vel: NDArray[np.float_] = np.array([1.0, 0.0], dtype=np.float64)
     return Particle(species_A, pos, vel)
 
