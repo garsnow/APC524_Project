@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Tuple, Optional, cast
 
 import numpy as np
+from numpy.random import Generator, default_rng
 import pytest  # type: ignore[import-untyped]
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
