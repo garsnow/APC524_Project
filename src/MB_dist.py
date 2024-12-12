@@ -126,8 +126,8 @@ class MDSimulation:
             np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
         )
 
-        iarr: NDArray[np.intp] = collisions_raw[0].astype(np.intp)
-        jarr: NDArray[np.intp] = collisions_raw[1].astype(np.intp)
+        iarr: NDArray[np.intp] = collisions_raw[0]
+        jarr: NDArray[np.intp] = collisions_raw[1]
 
         # Ensure each pair is processed only once
         k: NDArray[np.bool_] = iarr < jarr
@@ -240,8 +240,6 @@ class Histogram:
         self.bins: NDArray[np.float64] = np.linspace(0, xmax, nbars, dtype=np.float64)
         self.hist: NDArray[np.float64]
         self.hist, self.bins = np.histogram(data, self.bins, density=density)
-        self.hist: NDArray[np.float64] = self.hist.astype(np.float64)
-        self.bins: NDArray[np.float64] = self.bins.astype(np.float64)
 
         # Drawing the histogram with Matplotlib patches owes a lot to
         # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
