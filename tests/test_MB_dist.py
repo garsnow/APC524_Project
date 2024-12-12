@@ -2,6 +2,7 @@ import numpy as np
 import pytest  # type: ignore[import-untyped]
 from scipy.stats import kstest  # type: ignore[import-untyped]
 from typing import Tuple, cast
+from numpy.random import Generator, default_rng
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
 
