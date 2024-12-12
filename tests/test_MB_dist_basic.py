@@ -23,7 +23,7 @@ Y: int = 1
 
 @pytest.fixture
 def species_A() -> Species:
-    return Species(name="A", mass=1.0, radius=0.05, color="red")
+    return cast(Species(name="A", mass=1.0, radius=0.05, color="red"))
 
 
 @pytest.fixture
