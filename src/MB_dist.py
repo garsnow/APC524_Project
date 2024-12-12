@@ -267,7 +267,7 @@ class Histogram:
         Args:
             ax: matplotlib axes object
         """
-        codes: NDArray[np.int64] = np.ones(self.nverts, dtype=int64) * path.Path.LINETO
+        codes: NDArray[np.int_] = np.ones(self.nverts, dtype=intp) * path.Path.LINETO
         codes[0::5] = path.Path.MOVETO
         codes[4::5] = path.Path.CLOSEPOLY
         barpath: path.Path = path.Path(self.verts, codes)
