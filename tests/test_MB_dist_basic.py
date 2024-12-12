@@ -4,10 +4,14 @@ from typing import List, Tuple, Optional, cast
 
 import numpy as np
 from numpy.random import Generator, default_rng
-import pytest  # type: ignore
+import pytest
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 from numpy.typing import NDArray
+
+# Add 'src/' directory to sys.path
+src_path: Path = Path(__file__).parent.parent / "src"
+sys.path.insert(0, str(src_path.resolve()))
 
 # Initialize the random number generator
 rng: Generator = np.random.default_rng()
@@ -34,22 +38,22 @@ def species_C() -> Species:
 
 @pytest.fixture
 def particle_A(species_A: Species) -> Particle:
-    pos: NDArray[np.float64] = np.array([0.2, 0.5], dtype=np.float64)
-    vel: NDArray[np.float64] = np.array([1.0, 0.0], dtype=np.float64)
+    pos: NDArray[np.float_] = np.array([0.2, 0.5], dtype=np.float64)
+    vel: NDArray[np.float_] = np.array([1.0, 0.0], dtype=np.float64)
     return Particle(species_A, pos, vel)
 
 
 @pytest.fixture
 def particle_B(species_B: Species) -> Particle:
-    pos: NDArray[np.float64] = np.array([0.8, 0.5], dtype=np.float64)
-    vel: NDArray[np.float64] = np.array([-1.0, 0.0], dtype=np.float64)
+    pos: NDArray[np.float_] = np.array([0.8, 0.5], dtype=np.float64)
+    vel: NDArray[np.float_] = np.array([-1.0, 0.0], dtype=np.float64)
     return Particle(species_B, pos, vel)
 
 
 @pytest.fixture
 def particle_C(species_C: Species) -> Particle:
-    pos: NDArray[np.float64] = np.array([0.5, 0.5], dtype=np.float64)
-    vel: NDArray[np.float64] = np.array([0.0, 0.0], dtype=np.float64)
+    pos: NDArray[np.float_] = np.array([0.5, 0.5], dtype=np.float64)
+    vel: NDArray[np.float_] = np.array([0.0, 0.0], dtype=np.float64)
     return Particle(species_C, pos, vel)
 
 
