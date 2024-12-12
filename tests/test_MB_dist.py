@@ -1,7 +1,8 @@
 import numpy as np
 import pytest  # type: ignore[import-untyped]
 from scipy.stats import kstest  # type: ignore[import-untyped]
-from typing import Tuple, cast, NDArray
+from typing import List, Tuple, cast
+from np.typing import NDArray
 from numpy.random import Generator, default_rng
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
@@ -18,7 +19,7 @@ def is_maxwell_boltzmann(
 ) -> bool:
     kb: float = 1.38e-23
 
-    def cdf(v: float) -> float:
+    def cdf(v: float) -> bool:
         return sum(
             [
                 (2 / np.sqrt(np.pi))
