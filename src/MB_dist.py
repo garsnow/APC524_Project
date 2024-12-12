@@ -369,20 +369,20 @@ def particle_simulator_initial_steps(
     vel_C: NDArray[np.float64] = rng.random((int(num_C), 2), dtype=np.float64) - 0.5
 
     # Create Particle instances
-    for p, v in zip(pos_A, vel_A):
-        p: NDArray[np.float64] = p
-        v: NDArray[np.float64] = v
-        particles.append(Particle(species_A, p, v))
+    for p_A, v_A in zip(pos_A, vel_A):
+        p_A: NDArray[np.float64] = p_A
+        v_A: NDArray[np.float64] = v_A
+        particles.append(Particle(species_A, p_A, v_A))
 
-    for p, v in zip(pos_B, vel_B):
-        p: NDArray[np.float64] = p
-        v: NDArray[np.float64] = v
-        particles.append(Particle(species_B, p, v))
+    for p_B, v_B in zip(pos_B, vel_B):
+        p_B: NDArray[np.float64] = p_B
+        v_B: NDArray[np.float64] = v_B
+        particles.append(Particle(species_B, p_B, v_B))
     
-    for p, v in zip(pos_C, vel_C):
-        p: NDArray[np.float64] = p
-        v: NDArray[np.float64] = v
-        particles.append(Particle(species_C, p, v))
+    for p_C, v_C in zip(pos_C, vel_C):
+        p_C: NDArray[np.float64] = p_C
+        v_C: NDArray[np.float64] = v_C
+        particles.append(Particle(species_C, p_C, v_C))
     return particles
 
 
