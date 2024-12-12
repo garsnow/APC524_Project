@@ -263,10 +263,10 @@ def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
 
 
 def setup_plot(sim):
-     """
+    """
     Set up the Matplotlib figures and axes for simulation and histogram.
     """
-     fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.set_aspect("equal", "box")
@@ -287,7 +287,7 @@ def setup_plot(sim):
     speed_ax = fig.add_subplot(122)
     speed_hist = Histogram(speeds, xmax=np.max(speeds) * 2, nbars=50, density=True)
     speed_hist.draw(speed_ax)
- 
+
     sgrid_hi = np.linspace(0, speed_hist.bins[-1], 200)
     f = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
     (mb_line,) = speed_ax.plot(sgrid_hi, f, c="0.7")
@@ -297,11 +297,25 @@ def setup_plot(sim):
     # For the distribution derived by averaging, take the abcissa speed points from the centre of the histogram bars.
     sgrid = (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
     (mb_est_line,) = speed_ax.plot([], [], c="r")
-    mb_est = np.zeros(len(sgrid)) 
+    mb_est = np.zeros(len(sgrid))
     xlabel, ylabel = sgrid[-1] / 2, 0.8 * fmax
-    label = speed_ax.text(xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w")
+    label = speed_ax.text(
+        xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"
+    )
 
-    return fig, ax, scatter, speed_ax, speed_hist, mb_line, mb_est_line, mb_est, label, sgrid
+    return (
+        fig,
+        ax,
+        scatter,
+        speed_ax,
+        speed_hist,
+        mb_line,
+        mb_est_line,
+        mb_est,
+        label,
+        sgrid,
+    )
+
 
 def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     """
@@ -311,12 +325,20 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     sim = MDSimulation(particles, reaction_probability)
     dt = 1 / FPS
 
-    fig, ax, scatter, speed_ax, speed_hist, mb_line, mb_est_line, mb_est, label, sgrid = setup_plots(sim)
+    (
+        fig,
+        ax,
+        scatter,
+        speed_ax,
+        speed_hist,
+        mb_line,
+        mb_est_line,
+        mb_est,
+        label,
+        sgrid,
+    ) = setup_plot(sim)
     # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
     time_steps, count_A, count_B, count_C = [], [], [], []
-
-   
-   
 
     def init_anim():
         """Initialize the animation"""
