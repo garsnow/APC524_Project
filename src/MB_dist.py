@@ -210,7 +210,7 @@ def get_KE(m, speeds):
     """Return the total kinetic energy of all particles in scaled units."""
     return 0.5 * m * np.sum(speeds**2)
 
-def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C)
+def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
     expected_matrix_length = 3
     error_message = "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
     # Validate Matrix_A
