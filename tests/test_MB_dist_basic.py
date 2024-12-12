@@ -8,7 +8,7 @@ import pytest  # type: ignore[import-untyped]
 
 # Add 'src/' directory to sys.path
 src_path: Path = Path(__file__).parent.parent / "src"
-sys.path.insert(0, src_path.resolve())
+sys.path.insert(0, str(src_path.resolve()))
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 from numpy.typing import NDArray
@@ -158,7 +158,7 @@ def simulation_elastic(species_A: Species) -> MDSimulation:
     ],
 )
 def test_get_speeds(particles: List[Particle], expected_speeds: NDArray[np.float64]) -> None:
-    computed_speeds: NDArray[np.float64] = get_speeds(particles)
+    computed_speeds: NDArray[np.float64] = get_speeds(particles).astype(np.float64)
     np.testing.assert_array_almost_equal(computed_speeds, expected_speeds)
 
 
@@ -167,7 +167,7 @@ def test_get_speeds_empty() -> None:
     particles: List[Particle] = []
     expected_speeds: NDArray[np.float64] = np.array([], dtype=np.float64)
 
-    computed_speeds: NDArray[np.float64] = get_speeds(particles)
+    computed_speeds: NDArray[np.float64] = get_speeds(particles).astype(np.float64)
     np.testing.assert_array_equal(computed_speeds, expected_speeds)
 
 
@@ -308,9 +308,10 @@ def test_Histogram_update() -> None:
     data_new: NDArray[np.float64] = np.array([2, 3, 4, 4, 4, 4], dtype=np.float64)
     hist_obj.update(data_new)
 
-    expected_hist: NDArray[np.float64]
-    _, expected_bins = np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
-    expected_hist, _ = np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
+    expected_hist, expected_bins = cast(
+        Tuple[NDArray[np.float64], NDArray[np.float64]],
+        np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
+    )
     assert np.array_equal(hist_obj.hist, expected_hist)
     expected_top: NDArray[np.float64] = np.zeros(len(expected_hist), dtype=np.float64) + expected_hist
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
@@ -337,9 +338,14 @@ def test_MDSimulation_reaction(simulation_reaction: MDSimulation) -> None:
     ), "Number of particles after reaction is incorrect."
     new_p: Particle = simulation_reaction.particles[-1]
     assert new_p.species.name == "C", "New particle should be of species 'C'."
-    expected_pos: NDArray[np.float64] = 0.5 * (p1.pos + p2.pos)
-    expected_vel: NDArray[np.float64] = (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
-
+    expected_pos: NDArray[np.float64] = cast(
+        NDArray[np.float64], 
+        (0.5 * (p1.pos + p2.pos))
+    )
+    expected_vel: NDArray[np.float64] = cast(
+        NDArray[np.float64],
+        (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
+    )
     np.testing.assert_array_almost_equal(new_p.pos, expected_pos)
     np.testing.assert_array_almost_equal(new_p.vel, expected_vel)
 
