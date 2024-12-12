@@ -244,8 +244,8 @@ class Histogram:
         # Drawing the histogram with Matplotlib patches owes a lot to
         # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
         # Get the corners of the rectangles for the histogram.
-        self.left: NDArray[np.float64] = np.array(bins[:-1], dtype=np.float64)
-        self.right: NDArray[np.float64] = np.array(bins[1:], dtype=np.float64)
+        self.left: NDArray[np.float64] = np.array(self.bins[:-1], dtype=np.float64)
+        self.right: NDArray[np.float64] = np.array(self.bins[1:], dtype=np.float64)
         self.bottom: NDArray[np.float64] = np.zeros(len(self.left), dtype=np.float64)
         self.top: NDArray[np.float64] = self.bottom + self.hist
         nrects: int = len(self.left)
