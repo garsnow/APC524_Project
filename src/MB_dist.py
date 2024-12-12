@@ -359,20 +359,20 @@ def particle_simulator_initial_steps(
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right, species C in the middle
-    pos_A: NDArray[np.float64] = rng.random((int(num_A), 2)) * 0.4 + 0.05  # left side
-    vel_A: NDArray[np.float64] = rng.random((int(num_A), 2)) - 0.5
+    pos_A: NDArray[np.float64] = rng.random((int(num_A), 2), dtype=np.float64) * 0.4 + 0.05  # left side
+    vel_A: NDArray[np.float64] = rng.random((int(num_A), 2), dtype=np.float64) - 0.5
 
-    pos_B: NDArray[np.float64] = rng.random((int(num_B), 2)) * 0.4 + 0.55  # right side
-    vel_B: NDArray[np.float64] = rng.random((int(num_B), 2)) - 0.5
+    pos_B: NDArray[np.float64] = rng.random((int(num_B), 2), dtype=np.float64) * 0.4 + 0.55  # right side
+    vel_B: NDArray[np.float64] = rng.random((int(num_B), 2), dtype=np.float64) - 0.5
 
-    pos_C: NDArray[np.float64] = rng.random((int(num_C), 2)) * 0.4 + 0.3  # middle
-    vel_C: NDArray[np.float64] = rng.random((int(num_C), 2)) - 0.5
+    pos_C: NDArray[np.float64] = rng.random((int(num_C), 2), dtype=np.float64) * 0.4 + 0.3  # middle
+    vel_C: NDArray[np.float64] = rng.random((int(num_C), 2), dtype=np.float64) - 0.5
 
     # Create Particle instances
     particles += (
-        [Particle(species_A, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, p.astype(np.float64), v.astype(np.float64)) for p, v in zip(pos_C, vel_C)]
+        [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C)]
     )
     return particles
 
