@@ -126,8 +126,8 @@ class MDSimulation:
             np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
         )
 
-        iarr: NDArray[np.intp] = collisions_raw[0]
-        jarr: NDArray[np.intp] = collisions_raw[1]
+        iarr: NDArray[np.intp] = collisions[0].astype(np.intp)
+        jarr: NDArray[np.intp] = collisions[1].astype(np.intp)
 
         # Ensure each pair is processed only once
         k: NDArray[np.bool_] = iarr < jarr
