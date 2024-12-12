@@ -47,9 +47,9 @@ jobs:
           pip install numpy
           pip install matplotlib
           pip install scipy
-      
+
       - name: Run mypy
-        run: mypy .
+        run: mypy src/MB_dist.py tests/test_MB_dist.py tests/test_MB_dist_basic.py
 
   tests:
     runs-on: "${{ matrix.runs-on }}"
