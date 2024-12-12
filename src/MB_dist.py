@@ -1,13 +1,12 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-import random
-
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
 
-plt.use("TkAgg")
+matplotlib.use("TkAgg")
 
 X, Y = 0, 1
 
@@ -243,16 +242,18 @@ def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
     species_B = Species(name="B", mass=mass_B, radius=radius_B, color="blue")
     species_C = Species(name="C", mass=mass_C, radius=radius_C, color="purple")
 
+    rng = default_rng()
+
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
-    pos_A = np.random.Generator(int(num_A), 2) * 0.4 + 0.05  # left side
-    vel_A = np.random.Generator(int(num_A), 2) - 0.5
+    pos_A = nrg.random(int(num_A), 2) * 0.4 + 0.05  # left side
+    vel_A = nrg.random(int(num_A), 2) - 0.5
 
-    pos_B = np.random.Generator(int(num_B), 2) * 0.4 + 0.55  # right side
-    vel_B = np.random.Generator(int(num_B), 2) - 0.5
+    pos_B = nrg.random(int(num_B), 2) * 0.4 + 0.55  # right side
+    vel_B = nrg.random(int(num_B), 2) - 0.5
 
-    pos_C = np.random.Generator(int(num_C), 2) * 0.4 + 0.3  # middle
-    vel_C = np.random.Generator(int(num_C), 2) - 0.5
+    pos_C = nrg.random(int(num_C), 2) * 0.4 + 0.3  # middle
+    vel_C = nrg.random(int(num_C), 2) - 0.5
 
     particles += (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
@@ -337,6 +338,7 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
         label,
         sgrid,
     ) = setup_plot(sim)
+    sim.fig = fig
     # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
     time_steps, count_A, count_B, count_C = [], [], [], []
 
