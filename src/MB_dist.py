@@ -207,7 +207,7 @@ class MDSimulation:
                 separation: float = p1.radius * 1e-3
                 p1.pos[X] += separation
                 p2.pos[X] -= separation
-                r12 = p1.pos - p2.pos
+                r12: NDArray[np.float64] = (p1.pos - p2.pos).astype(np.float64)
                 r12_sq = np.dot(r12, r12)
 
             v_rel: float = np.dot(v12, r12) / r12_sq
@@ -247,7 +247,7 @@ class Histogram:
         self.left: NDArray[np.float64] = np.array(self.bins[:-1], dtype=np.float64)
         self.right: NDArray[np.float64] = np.array(self.bins[1:], dtype=np.float64)
         self.bottom: NDArray[np.float64] = np.zeros(len(self.left), dtype=np.float64)
-        self.top: NDArray[np.float64] = self.bottom + self.hist
+        self.top: NDArray[np.float64] = (self.bottom + self.hist).astype(np.float64)
         nrects: int = len(self.left)
         self.nverts: int = nrects * 5
         self.verts: NDArray[np.float64] = np.zeros((self.nverts, 2), dtype=np.float64)
@@ -267,7 +267,7 @@ class Histogram:
         Args:
             ax: matplotlib axes object
         """
-        codes: NDArray[np.int_] = np.ones(self.nverts, dtype=int) * path.Path.LINETO
+        codes: NDArray[np.intp] = np.ones(self.nverts, dtype=intp) * path.Path.LINETO
         codes[0::5] = path.Path.MOVETO
         codes[4::5] = path.Path.CLOSEPOLY
         barpath: path.Path = path.Path(self.verts, codes)
@@ -286,7 +286,7 @@ class Histogram:
         self.hist, self.bins = np.histogram(data, self.bins, density=self.density)
         self.hist = self.hist.astype(np.float64)
         self.bins = self.bins.astype(np.float64)
-        self.top = self.bottom + self.hist
+        self.top = (self.bottom + self.hist).astype(np.float64)
         self.verts[1::5, 1] = self.top
         self.verts[2::5, 1] = self.top
 
@@ -442,7 +442,7 @@ def setup_plot(
 
     # The 2D Maxwell-Boltzmann distribution of speeds & Histogram setup.
     masses: list[float] = [p.mass for p in sim.particles]
-    m: float = np.mean(masses)
+    m: float = float(np.mean(masses))
     speeds: NDArray[np.float64] = get_speeds(sim.particles)
     mean_KE: float = float(get_KE(m, speeds) / sim.n)
     a: float = m / (2 * mean_KE)
@@ -461,7 +461,7 @@ def setup_plot(
     speed_ax.set_ylim(0, fmax)
 
     # For the distribution derived by averaging, take the abscissa speed points from the centre of the histogram bars.
-    sgrid: NDArray[np.float64] = (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
+    sgrid: NDArray[np.float64] = ((speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2).astype(np.float64)
     mb_est_line: Line2D = speed_ax.plot([], [], c="r")[0]
     mb_est: NDArray[np.float64] = np.zeros(len(sgrid), dtype=np.float64)
     xlabel: float = sgrid[-1] / 2
