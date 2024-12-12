@@ -1,7 +1,7 @@
 import numpy as np
 import pytest  # type: ignore[import-untyped]
 from scipy.stats import kstest  # type: ignore[import-untyped]
-from typing import Tuple, cast
+from typing import Tuple, cast, NDArray
 from numpy.random import Generator, default_rng
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
@@ -14,7 +14,7 @@ rng: Generator = np.random.default_rng()
 
 
 def is_maxwell_boltzmann(
-    speeds: np.ndarray, masses: np.ndarray, T: float
+    speeds: NDArray[np.float64], masses: NDArray[np.float64], T: float
 ) -> bool:
     kb: float = 1.38e-23
 
@@ -33,7 +33,7 @@ def is_maxwell_boltzmann(
     return p_value < cutoff
 
 
-def setup_simulation() -> Tuple[MDSimulation, float, np.ndarray, float]:
+def setup_simulation() -> Tuple[MDSimulation, float, NDArray[np.float64], float]:
     num_A: int = 500
     num_B: int = 500
     num_C: int = 500
@@ -42,27 +42,27 @@ def setup_simulation() -> Tuple[MDSimulation, float, np.ndarray, float]:
     species_B: Species = Species(name="B", mass=2.0, radius=0.02, color="blue")
     species_C: Species = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
-    pos_A: np.ndarray = rng.random((num_A, 2))  # Random positions
-    vel_A: np.ndarray = rng.random((num_A, 2)) - 0.5  # Random velocities
+    pos_A: NDArray[np.float64] = rng.random((num_A, 2))  # Random positions
+    vel_A: NDArray[np.float64] = rng.random((num_A, 2)) - 0.5  # Random velocities
 
-    pos_B: np.ndarray = rng.random((num_B, 2))  # Random positions
-    vel_B: np.ndarray = rng.random((num_B, 2)) - 0.5  # Random velocities
+    pos_B: NDArray[np.float64] = rng.random((num_B, 2))  # Random positions
+    vel_B: NDArray[np.float64] = rng.random((num_B, 2)) - 0.5  # Random velocities
 
-    pos_C: np.ndarray = rng.random((num_C, 2))  # Random positions
-    vel_C: np.ndarray = rng.random((num_C, 2)) - 0.5  # Random velocities
+    pos_C: NDArray[np.float64] = rng.random((num_C, 2))  # Random positions
+    vel_C: NDArray[np.float64] = rng.random((num_C, 2)) - 0.5  # Random velocities
 
     # Create Particle instances with proper type casting
     particles: List[Particle] = (
-        [Particle(species_A, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, cast(np.ndarray, p), cast(np.ndarray, v)) for p, v in zip(pos_C, vel_C)]
+        [Particle(species_A, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_A, vel_A)]
+        + [Particle(species_B, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_B, vel_B)]
+        + [Particle(species_C, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_C, vel_C)]
     )
 
     sim: MDSimulation = MDSimulation(particles, reaction_probability)
     dt: float = 1 / 30  # Time step
     T: float = 300.0  # Temperature
 
-    masses: np.ndarray = np.array([p.mass for p in particles], dtype=np.float64)
+    masses: NDArray[np.float64] = np.array([p.mass for p in particles], dtype=np.float64)
 
     return (
         sim,
@@ -81,7 +81,7 @@ def test_MB() -> None:
         sim.advance(dt)
 
     # Extract the final speeds from the simulation
-    final_speeds: np.ndarray = get_speeds(sim.particles)
+    final_speeds: NDArray[np.float64] = get_speeds(sim.particles)
 
     # Check if the final speeds distribution follows the Maxwell-Boltzmann distribution
     assert is_maxwell_boltzmann(
