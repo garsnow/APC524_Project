@@ -1,12 +1,13 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-import mpl
 import random
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
 from scipy.spatial.distance import pdist, squareform
-matplotlib.use("TkAgg")
+
+plt.use("TkAgg")
 
 X, Y = 0, 1
 
@@ -210,7 +211,9 @@ def get_KE(m, speeds):
     """Return the total kinetic energy of all particles in scaled units."""
     return 0.5 * m * np.sum(speeds**2)
 
+
 def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
+    particles = []
     expected_matrix_length = 3
     error_message = "Matrix_A must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
     # Validate Matrix_A
@@ -225,7 +228,7 @@ def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
     ):
         if not (
-            isinstance(Matrix, (list, tuple, np.ndarray))
+            isinstance(Matrix, list | tuple | np.ndarray)
             and len(Matrix) == expected_matrix_length
         ):
             raise ValueError(error_message)
@@ -250,36 +253,26 @@ def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
 
     pos_C = np.random.Generator(int(num_C), 2) * 0.4 + 0.3  # middle
     vel_C = np.random.Generator(int(num_C), 2) - 0.5
-        
-    particles = (
+
+    particles += (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
         + [Particle(species_B, p, v) for p, v in zip(pos_B, vel_B, strict=False)]
         + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
     )
     return particles
+
+
 def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     """
-    Initialize and run the molecular dynamics simulation.
-
-    Parameters:
-    - Matrix_A: List or NumPy array containing [num_A, mass_A, radius_A]
-    - num_B: Number of particles for species B
-    - time_step: Frames per second (FPS)
-    - reaction_probability: Probability of reaction upon collision
-    - num_C: Number of initial particles for species C (default is 0)
+    Initialize and run the molecular dynamics simulation. See simulation_caller for description.
     """
     particles = particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C)
     sim = MDSimulation(particles, reaction_probability)
-
     dt = 1 / FPS
 
-    # initializes counters for time, and number of A,B,C
-    # used to create concentration vs time profiles
-    time_steps = []
-    count_A = []
-    count_B = []
-    count_C = []
-    
+    # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
+    time_steps, count_A, count_B, count_C = [], [], [], []
+
     # Set up plotting
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xlim(0, 1)
@@ -289,45 +282,36 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     ax.set_yticks([])
 
     # We'll use a scatter plot so we can easily set individual particle colors
-    x = [p.pos[X] for p in sim.particles]
-    y = [p.pos[Y] for p in sim.particles]
+    x, y = [p.pos[X] for p in sim.particles], [p.pos[Y] for p in sim.particles]
     colors = [p.color for p in sim.particles]
     scatter = ax.scatter(x, y, c=colors, s=30)
 
     # The 2D Maxwell-Boltzmann equilibrium distribution of speeds.
-
     # caclulates an average mass for the two particles
     masses = [p.mass for p in sim.particles]
     m = np.mean(masses)
-
     # computes speeds from particles
     speeds = get_speeds(sim.particles)
-
     mean_KE = get_KE(m, speeds) / sim.n
     a = m / 2 / mean_KE
-
     # speed subplot
     speed_ax = fig.add_subplot(122)
     speed_hist = Histogram(speeds, xmax=np.max(speeds) * 2, nbars=50, density=True)
     speed_hist.draw(speed_ax)
-
     # Use a high-resolution grid of speed points so that the exact distribution
     # looks smooth.
     sgrid_hi = np.linspace(0, speed_hist.bins[-1], 200)
     f = 2 * a * sgrid_hi * np.exp(-a * sgrid_hi**2)
     (mb_line,) = speed_ax.plot(sgrid_hi, f, c="0.7")
-
     # Maximum value of the 2D Maxwell-Boltzmann speed distribution.
     fmax = np.sqrt(m / mean_KE / np.e)
     speed_ax.set_ylim(0, fmax)
-
-    # For the distribution derived by averaging, take the abcissa speed points from
-    # the centre of the histogram bars.
+    # For the distribution derived by averaging, take the abcissa speed points from the centre of the histogram bars.
     sgrid = (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
     (mb_est_line,) = speed_ax.plot([], [], c="r")
-    mb_est = np.zeros(len(sgrid))
-
-    # A text label indicating the time and step number for each animation frame.
+    mb_est = np.zeros(
+        len(sgrid)
+    )  # A text label indicating the time and step number for each animation frame.
     xlabel, ylabel = sgrid[-1] / 2, 0.8 * fmax
     label = speed_ax.text(
         xlabel, ylabel, f"$t$ = {0:.1f}s, step = {0:d}", backgroundcolor="w"

@@ -1,7 +1,9 @@
 import sys
 from pathlib import Path
+
 import numpy as np
 import pytest
+
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
 
 # Initialize the random number generator
