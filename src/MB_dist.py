@@ -16,7 +16,7 @@ from matplotlib.patches import PathPatch
 import numpy as np
 from numpy.typing import NDArray
 from numpy.random import Generator, default_rng
-from scipy.spatial.distance import pdist, squareform  # type: ignore[import-untyped]
+from scipy.spatial.distance import pdist, squareform
 
 # Set Matplotlib backend based on environment variable or default to 'TkAgg'
 mpl_backend: str = os.getenv("MPLBACKEND", "TkAgg")
@@ -207,8 +207,8 @@ class MDSimulation:
                 separation: float = p1.radius * 1e-3
                 p1.pos[X] += separation
                 p2.pos[X] -= separation
-                r12: NDArray[np.float64] = (p1.pos - p2.pos).astype(np.float64)
-                r12_sq = np.dot(r12, r12)
+                r12_0: NDArray[np.float64] = (p1.pos - p2.pos).astype(np.float64)
+                r12_sq = np.dot(r12_0, r12_0)
 
             v_rel: float = np.dot(v12, r12) / r12_sq
 
@@ -267,7 +267,7 @@ class Histogram:
         Args:
             ax: matplotlib axes object
         """
-        codes: NDArray[np.intp] = np.ones(self.nverts, dtype=intp) * path.Path.LINETO
+        codes: NDArray[np.int64] = np.ones(self.nverts, dtype=int64) * path.Path.LINETO
         codes[0::5] = path.Path.MOVETO
         codes[4::5] = path.Path.CLOSEPOLY
         barpath: path.Path = path.Path(self.verts, codes)
