@@ -382,19 +382,19 @@ def particle_simulator_initial_steps(
     
     # Create Particle instances
     for p, v in zip(pos_A, vel_A):
-        pos_p: NDArray[np.float64] = cast(NDArray[np.float64], p)
-        vel_v: NDArray[np.float64] = cast(NDArray[np.float64], v)
-        particles.append(Particle(species_A, pos_p, vel_v))
+        pos_pA: NDArray[np.float64] = cast(NDArray[np.float64], p)
+        vel_vA: NDArray[np.float64] = cast(NDArray[np.float64], v)
+        particles.append(Particle(species_A, pos_pA, vel_vA))
 
     for p, v in zip(pos_B, vel_B):
-        pos_p: NDArray[np.float64] = cast(NDArray[np.float64], p)
-        vel_v: NDArray[np.float64] = cast(NDArray[np.float64], v)
-        particles.append(Particle(species_B, pos_p, vel_v))
+        pos_pB: NDArray[np.float64] = cast(NDArray[np.float64], p)
+        vel_vB: NDArray[np.float64] = cast(NDArray[np.float64], v)
+        particles.append(Particle(species_B, pos_pB, vel_vB))
     
     for p, v in zip(pos_C, vel_C):
-        pos_p: NDArray[np.float64] = cast(NDArray[np.float64], p)
-        vel_v: NDArray[np.float64] = cast(NDArray[np.float64], v)
-        particles.append(Particle(species_C, pos_p, vel_v))
+        pos_pC: NDArray[np.float64] = cast(NDArray[np.float64], p)
+        vel_vC: NDArray[np.float64] = cast(NDArray[np.float64], v)
+        particles.append(Particle(species_C, pos_pC, vel_vC))
     return particles
 
 
