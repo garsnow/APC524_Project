@@ -1,16 +1,16 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
+
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
+from numpy.random import default_rng
 from scipy.spatial.distance import pdist, squareform
-from numpy.random import default_rng  
-from itertools import chain
 
 # Set Matplotlib backend based on environment variable or default to 'TkAgg'
-mpl_backend = os.getenv('MPLBACKEND', 'TkAgg')
+mpl_backend = os.getenv("MPLBACKEND", "TkAgg")
 mpl.use(mpl_backend)
 X, Y = 0, 1
 
