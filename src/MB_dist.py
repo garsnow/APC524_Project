@@ -1,7 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import Tuple, Optional
+from typing import cast, Tuple, Optional
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
@@ -51,8 +51,8 @@ class Particle:
     def __init__(
         self,
         species: Species,
-        pos: list[float] | tuple[float, float] | NDArray[np.float64],
-        vel: list[float] | tuple[float, float] | NDArray[np.float64],
+        pos: NDArray[np.float64],
+        vel: NDArray[np.float64],
     ) -> None:
         self.species: Species = species
         self.pos: Position = np.array(pos, dtype=float)
@@ -240,7 +240,10 @@ class Histogram:
         self.density: bool = density
         self.bins: NDArray[np.float64] = np.linspace(0, xmax, nbars)
         self.hist: NDArray[np.float64]
-        self.hist, bins = np.histogram(data, self.bins, density=density)
+        self.hist, bins = self.hist, bins = cast(
+            Tuple[NDArray[np.float64], NDArray[np.float64]],
+            np.histogram(data, self.bins, density=density)
+        )
 
         # Drawing the histogram with Matplotlib patches owes a lot to
         # https://matplotlib.org/3.1.1/gallery/animation/animated_histogram.html
@@ -284,7 +287,10 @@ class Histogram:
         Args:
             data: New data for histogram
         """
-        self.hist, bins = np.histogram(data, self.bins, density=self.density)
+        self.hist, bins = self.hist, bins = cast(
+            Tuple[NDArray[np.float64], NDArray[np.float64]],
+            np.histogram(data, self.bins, density=density)
+        )
         self.top = self.bottom + self.hist
         self.verts[1::5, 1] = self.top
         self.verts[2::5, 1] = self.top
@@ -328,8 +334,7 @@ def particle_simulator_initial_steps(
 
     # Validate Matrix_A
     if not (
-        isinstance(Matrix_A, list | tuple | np.ndarray)
-        and len(Matrix_A) == MATRIX_SIZE
+        len(Matrix_A) == MATRIX_SIZE
     ):
         raise ValueError(error_message)
 
@@ -338,8 +343,7 @@ def particle_simulator_initial_steps(
         [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"]
     ):
         if not (
-            isinstance(Matrix, list | tuple | np.ndarray)
-            and len(Matrix) == MATRIX_SIZE
+            len(Matrix) == MATRIX_SIZE
         ):
             raise ValueError(error_message)
 
