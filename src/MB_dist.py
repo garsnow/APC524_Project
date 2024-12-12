@@ -1,12 +1,13 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.animation import FuncAnimation
+from numpy.random import default_rng
 from scipy.spatial.distance import pdist, squareform
 
-matplotlib.use("TkAgg")
+mpl.use("TkAgg")
 
 X, Y = 0, 1
 
@@ -54,6 +55,7 @@ class MDSimulation:
         self.nsteps = 0
         self.reactions = []
         self.reaction_probability = reaction_probability
+        self.rng = default_rng()
 
     def advance(self, dt):
         self.nsteps += 1
@@ -117,7 +119,7 @@ class MDSimulation:
         if (
             (p1.species.name == "A" and p2.species.name == "B")
             or (p1.species.name == "B" and p2.species.name == "A")
-            and (random.random() < self.reaction_probability)
+            and (self.rng.random() < self.reaction_probability)
         ):
             new_pos = 0.5 * (p1.pos + p2.pos)
             m1, m2 = p1.mass, p2.mass
@@ -246,14 +248,14 @@ def particle_simulator_initial_steps(Matrix_A, Matrix_B, Matrix_C):
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right
-    pos_A = nrg.random(int(num_A), 2) * 0.4 + 0.05  # left side
-    vel_A = nrg.random(int(num_A), 2) - 0.5
+    pos_A = rng.random((int(num_A), 2)) * 0.4 + 0.05  # left side
+    vel_A = rng.random((int(num_A), 2)) - 0.5
 
-    pos_B = nrg.random(int(num_B), 2) * 0.4 + 0.55  # right side
-    vel_B = nrg.random(int(num_B), 2) - 0.5
+    pos_B = rng.random((int(num_B), 2)) * 0.4 + 0.55  # right side
+    vel_B = rng.random((int(num_B), 2)) - 0.5
 
-    pos_C = nrg.random(int(num_C), 2) * 0.4 + 0.3  # middle
-    vel_C = nrg.random(int(num_C), 2) - 0.5
+    pos_C = rng.random((int(num_C), 2)) * 0.4 + 0.3  # middle
+    vel_C = rng.random((int(num_C), 2)) - 0.5
 
     particles += (
         [Particle(species_A, p, v) for p, v in zip(pos_A, vel_A, strict=False)]
@@ -392,7 +394,7 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
         fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
     )
 
-    anim.save("MB_simulation.gif", writer="Pillow")
+    # anim.save("MB_simulation.gif", writer="Pillow")
     plt.show()
 
     # concentration vs time graph
@@ -407,3 +409,4 @@ def particle_simulator(Matrix_A, Matrix_B, Matrix_C, FPS, reaction_probability):
     plt.title("Concentration vs Time")
     plt.savefig("MB_simulation.png")
     plt.show()
+    anim.save("MB_simulation.gif", writer="Pillow")

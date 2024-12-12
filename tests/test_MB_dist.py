@@ -32,6 +32,7 @@ def setup_simulation():
     num_A = 500
     num_B = 500
     num_C = 500
+    reaction_probability = 1.0
     species_A = Species(name="A", mass=1.0, radius=0.01, color="red")
     species_B = Species(name="B", mass=2.0, radius=0.02, color="blue")
     species_C = Species(name="C", mass=3.0, radius=0.03, color="purple")
@@ -51,7 +52,7 @@ def setup_simulation():
         + [Particle(species_C, p, v) for p, v in zip(pos_C, vel_C, strict=False)]
     )
 
-    sim = MDSimulation(particles)
+    sim = MDSimulation(particles, reaction_probability)
     dt = 1 / 30  # Time step
     return (
         sim,
