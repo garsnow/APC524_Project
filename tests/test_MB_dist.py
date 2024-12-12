@@ -1,6 +1,6 @@
 import numpy as np
-import pytest  # type: ignore[import-untyped]
-from scipy.stats import kstest  # type: ignore[import-untyped]
+import pytest  
+from scipy.stats import kstest  
 from typing import List, Tuple, cast
 from numpy.typing import NDArray
 from numpy.random import Generator, default_rng
