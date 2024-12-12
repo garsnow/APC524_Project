@@ -4,14 +4,14 @@ from typing import List, Tuple, Optional, cast
 
 import numpy as np
 from numpy.random import Generator, default_rng
-import pytest  # type: ignore[import-untyped]
+import pytest
+
+from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
+from numpy.typing import NDArray
 
 # Add 'src/' directory to sys.path
 src_path: Path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path.resolve()))
-
-from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
-from numpy.typing import NDArray
 
 # Initialize the random number generator
 rng: Generator = np.random.default_rng()
@@ -308,10 +308,10 @@ def test_Histogram_update() -> None:
     data_new: NDArray[np.float64] = np.array([2, 3, 4, 4, 4, 4], dtype=np.float64)
     hist_obj.update(data_new)
 
-    expected_hist, expected_bins = cast(
-        Tuple[NDArray[np.float64], NDArray[np.float64]],
-        np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
-    )
+    expected_hist, expected_bins = np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
+    expected_hist = expected_hist.astype(np.float64)
+    expected_bins = expected_bins.astype(np.float64)
+    
     assert np.array_equal(hist_obj.hist, expected_hist)
     expected_top: NDArray[np.float64] = np.zeros(len(expected_hist), dtype=np.float64) + expected_hist
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
