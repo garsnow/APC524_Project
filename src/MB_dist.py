@@ -398,8 +398,10 @@ def particle_simulator_initial_steps(
         particles.append(Particle(species_C, pos_pC, vel_vC))
     return particles
 
-class SupportsSetFacecolors(Protocol):
+class SupportsSetFacecolorsAndOffsets(Protocol):
     def set_facecolors(self, colors: Any) -> None:
+        ...
+    def set_offsets(self, offsets: Any) -> None:
         ...
 
 def setup_plot(
@@ -407,7 +409,7 @@ def setup_plot(
 ) -> tuple[
     Figure,
     Axes,
-    SupportsSetFacecolors,
+    SupportsSetFacecolorsAndOffsets,
     Axes,
     Histogram,
     Line2D,
@@ -445,7 +447,7 @@ def setup_plot(
     y: list[float] = [p.pos[Y] for p in sim.particles]
 
     colors: list[Color] = [p.color for p in sim.particles]
-    scatter: SupportsSetFacecolors = ax.scatter(x, y, c=colors, s=30)
+    scatter: SupportsSetFacecolorsAndOffsets = ax.scatter(x, y, c=colors, s=30)
 
     # The 2D Maxwell-Boltzmann distribution of speeds & Histogram setup.
     masses: list[float] = [p.mass for p in sim.particles]
@@ -536,12 +538,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> tuple[Collection, Text]:
+    def init_anim() -> tuple[SupportsSetFacecolorsAndOffsets, Text]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> tuple[Collection, PathPatch, Line2D, Text]:
+    def animate(i: int) -> tuple[SupportsSetFacecolorsAndOffsets, PathPatch, Line2D, Text]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
