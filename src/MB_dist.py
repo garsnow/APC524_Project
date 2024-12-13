@@ -487,3 +487,114 @@ def setup_plot(
         label,
         sgrid,
     )
+
+def particle_simulator(
+    Matrix_A: list[float] | tuple[float, float, float] | NDArray[np.float64],
+    Matrix_B: list[float] | tuple[float, float, float] | NDArray[np.float64],
+    Matrix_C: list[float] | tuple[float, float, float] | NDArray[np.float64],
+    FPS: float,
+    reaction_probability: float,
+) -> None:
+    """
+    Initialize and run the molecular dynamics simulation. See simulation_caller for description.
+
+    Args:
+        Matrix_A: [num_A, mass_A, radius_A]
+        Matrix_B: [num_B, mass_B, radius_B]
+        Matrix_C: [num_C, mass_C, radius_C]
+        FPS: frames per second
+        reaction_probabilty = psuedo activation energy
+    """
+    particles: list[Particle] = particle_simulator_initial_steps(
+        Matrix_A, Matrix_B, Matrix_C
+    )
+    sim: MDSimulation = MDSimulation(particles, reaction_probability)
+    dt: float = 1 / FPS
+
+    (
+        fig,
+        ax,
+        scatter,
+        speed_ax,
+        speed_hist,
+        mb_line,
+        mb_est_line,
+        mb_est,
+        label,
+        sgrid,
+    ) = setup_plot(sim)
+
+    sim.fig = fig
+
+    # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
+    time_steps: list[float] = []
+    count_A: list[int] = []
+    count_B: list[int] = []
+    count_C: list[int] = []
+
+    def init_anim() -> tuple[PathCollection, plt.Text]:
+        """Initialize the animation"""
+        scatter.set_offsets(np.zeros((0, 2)))
+        return scatter, label
+
+    def animate(i: int) -> tuple[PathCollection, PathPatch, Line2D, plt.Text]:
+        """Advance the animation by one step and update the frame."""
+
+        nonlocal mb_est
+        sim.advance(dt)
+
+        # counts ABC for concentration profiles
+        nA: int = sum(1 for p in sim.particles if p.species.name == "A")
+        nB: int = sum(1 for p in sim.particles if p.species.name == "B")
+        nC: int = sum(1 for p in sim.particles if p.species.name == "C")
+
+        # appends concentration v time after each timestep
+        time_steps.append(i * dt)
+        count_A.append(nA)
+        count_B.append(nB)
+        count_C.append(nC)
+
+        x: list[float] = [p.pos[X] for p in sim.particles]
+        y: list[float] = [p.pos[Y] for p in sim.particles]
+        colors: list[Color] = [p.color for p in sim.particles]
+        scatter.set_facecolors(colors)
+        scatter.set_offsets(np.column_stack((x, y)))
+
+        speeds: NDArray[np.float64] = get_speeds(sim.particles)
+        speed_hist.update(speeds)
+
+        # Once the simulation has approached equilibrium a bit, start averaging
+        # the speed distribution to indicate the approximation to the Maxwell-
+        # Boltzmann distribution.
+        if i >= IAV_START:
+            mb_est += (speed_hist.hist - mb_est) / (i - IAV_START + 1)
+            mb_est_line.set_data(sgrid, mb_est)
+
+        label.set_text(f"$t$ = {i * dt:.1f} ns, step = {i:d}")
+
+        return scatter, speed_hist.patch, mb_est_line, label
+
+    # Only start averaging the speed distribution after frame number IAV_ST.
+    IAV_START: int = 1000
+    # Number of frames; set to None to run until explicitly quit.
+    frames: int = 1000
+    anim: FuncAnimation = FuncAnimation(
+        fig, animate, frames=frames, interval=10, blit=False, init_func=init_anim
+    )
+
+    # anim.save("MB_simulation.gif", writer="Pillow")
+    plt.show()
+
+    # concentration vs time graph
+    plt.figure()
+    # deletes last 100 list elements because the simulation resets and it messes up the graph
+    plt.plot(time_steps[:-100], count_A[:-100], label="[A]")
+    plt.plot(time_steps[:-100], count_B[:-100], label="[B]")
+    plt.plot(time_steps[:-100], count_C[:-100], label="[C]")
+    plt.xlabel("Time (ns)")
+    plt.ylabel("Concentration (particles/area)")
+    plt.legend()
+    plt.title("Concentration vs Time")
+    plt.savefig("MB_simulation.png")
+    plt.show()
+    anim.save("MB_simulation.gif", writer="Pillow")
