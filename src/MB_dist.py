@@ -400,7 +400,7 @@ def particle_simulator_initial_steps(
 from typing import Protocol, Any
 from matplotlib.artist import Artist
 
-class SupportsSetFacecolorsAndOffsets(Protocol, Artist):
+class SupportsSetFacecolorsAndOffsets(Protocol):
     def set_facecolors(self, colors: Any, *args: Any, **kwargs: Any) -> None:
         ...
     
