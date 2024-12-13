@@ -1,5 +1,4 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
-# Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
 from typing import Protocol, Any, cast
 
@@ -398,10 +397,14 @@ def particle_simulator_initial_steps(
         particles.append(Particle(species_C, pos_pC, vel_vC))
     return particles
 
-class SupportsSetFacecolorsAndOffsets(Protocol):
-    def set_facecolors(self, colors: Any) -> None:
+from typing import Protocol, Any
+from matplotlib.artist import Artist
+
+class SupportsSetFacecolorsAndOffsets(Protocol, Artist):
+    def set_facecolors(self, colors: Any, *args: Any, **kwargs: Any) -> None:
         ...
-    def set_offsets(self, offsets: Any) -> None:
+    
+    def set_offsets(self, offsets: Any, *args: Any, **kwargs: Any) -> None:
         ...
 
 def setup_plot(
@@ -447,7 +450,7 @@ def setup_plot(
     y: list[float] = [p.pos[Y] for p in sim.particles]
 
     colors: list[Color] = [p.color for p in sim.particles]
-    scatter: SupportsSetFacecolorsAndOffsets = ax.scatter(x, y, c=colors, s=30)
+    scatter: SupportsSetFacecolorsAndOffsets = cast(SupportsSetFacecolorsAndOffsets, ax.scatter(x, y, c=colors, s=30))
 
     # The 2D Maxwell-Boltzmann distribution of speeds & Histogram setup.
     masses: list[float] = [p.mass for p in sim.particles]
@@ -538,12 +541,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> tuple[SupportsSetFacecolorsAndOffsets, Text]:
+    def init_anim() -> Iterable[Artist]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> tuple[SupportsSetFacecolorsAndOffsets, PathPatch, Line2D, Text]:
+    def animate(i: int) -> Iterable[Artist]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
