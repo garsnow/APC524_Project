@@ -525,6 +525,7 @@ def particle_simulator(
         sgrid,
     ) = setup_plot(sim)
 
+    scatter = cast(PathCollection, scatter)
     sim.fig = fig
 
     # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
