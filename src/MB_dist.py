@@ -400,6 +400,22 @@ def particle_simulator_initial_steps(
 from typing import Protocol, Any
 from matplotlib.artist import Artist
 
+class ArtistProtocol(Protocol):
+    def draw(self, renderer: Any) -> None:
+        ...
+    
+    def get_visible(self) -> bool:
+        ...
+    
+    def set_visible(self, visible: bool) -> None:
+        ...
+    
+    def get_alpha(self) -> float:
+        ...
+    
+    def set_alpha(self, alpha: float) -> None:
+        ...
+
 class SupportsSetFacecolorsAndOffsets(Protocol):
     def set_facecolors(self, colors: Any, *args: Any, **kwargs: Any) -> None:
         ...
@@ -541,12 +557,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> Tuple[SupportsSetFacecolorsAndOffsets, Text]:
+    def init_anim() -> Iterable[Artist]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> Tuple[SupportsSetFacecolorsAndOffsets, PathPatch, Line2D, Text]:
+    def animate(i: int) -> Iterable[Artist]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
