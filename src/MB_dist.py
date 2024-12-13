@@ -12,6 +12,7 @@ from matplotlib.collections import PathCollection
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
+from matplotlib.animation import FuncAnimation
 from matplotlib.text import Text
 from numpy.random import Generator, default_rng
 from numpy.typing import NDArray
@@ -532,12 +533,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> tuple[PathCollection, plt.Text]:
+    def init_anim() -> tuple[PathCollection, Text]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> tuple[PathCollection, PathPatch, Line2D, plt.Text]:
+    def animate(i: int) -> tuple[PathCollection, PathPatch, Line2D, Text]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
