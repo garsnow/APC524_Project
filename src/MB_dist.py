@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.axes import Axes
-from matplotlib.collections import PathCollection
+from matplotlib.collections import Collection
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
@@ -442,7 +442,7 @@ def setup_plot(
     y: list[float] = [p.pos[Y] for p in sim.particles]
 
     colors: list[Color] = [p.color for p in sim.particles]
-    scatter: PathCollection = ax.scatter(x, y, c=colors, s=30)
+    scatter: Collection = ax.scatter(x, y, c=colors, s=30)
 
     # The 2D Maxwell-Boltzmann distribution of speeds & Histogram setup.
     masses: list[float] = [p.mass for p in sim.particles]
@@ -525,7 +525,6 @@ def particle_simulator(
         sgrid,
     ) = setup_plot(sim)
 
-    scatter = cast(PathCollection, scatter)
     sim.fig = fig
 
     # initializes counters for time, and number of A,B,C used to create concentration vs time profiles
