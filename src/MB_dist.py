@@ -416,7 +416,7 @@ class ArtistProtocol(Protocol):
     def set_alpha(self, alpha: float) -> None:
         ...
 
-class SupportsSetFacecolorsAndOffsets(Protocol):
+class SupportsSetFacecolorsAndOffsets(Protocol, ArtistProtocol):
     def set_facecolors(self, colors: Any, *args: Any, **kwargs: Any) -> None:
         ...
     
