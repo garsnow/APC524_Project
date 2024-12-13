@@ -541,12 +541,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> Iterable[Artist]:
+    def init_anim() -> Tuple[SupportsSetFacecolorsAndOffsets, Text]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> Iterable[Artist]:
+    def animate(i: int) -> Tuple[SupportsSetFacecolorsAndOffsets, PathPatch, Line2D, Text]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
