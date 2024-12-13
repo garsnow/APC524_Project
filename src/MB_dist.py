@@ -557,7 +557,7 @@ def particle_simulator(
         x: list[float] = [p.pos[X] for p in sim.particles]
         y: list[float] = [p.pos[Y] for p in sim.particles]
         colors: list[Color] = [p.color for p in sim.particles]
-        scatter.set_facecolors(colors)
+        scatter.set_facecolor(colors)
         scatter.set_offsets(np.column_stack((x, y)))
 
         speeds: NDArray[np.float64] = get_speeds(sim.particles)
