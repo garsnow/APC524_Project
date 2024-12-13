@@ -1,12 +1,12 @@
+from typing import cast
+
 import numpy as np
-import pytest  
-from scipy.stats import kstest  
-from typing import List, Tuple, cast
+import pytest
+from numpy.random import Generator
 from numpy.typing import NDArray
-from numpy.random import Generator, default_rng
+from scipy.stats import kstest
 
 from src.MB_dist import MDSimulation, Particle, Species, get_speeds
-
 
 cutoff: float = 0.05
 
@@ -30,13 +30,14 @@ def is_maxwell_boltzmann(
             )
             total += term
         return total
+
     d: float
     p_value: float
     d, p_value = kstest(speeds, cdf)
-    return (p_value < cutoff)
+    return p_value < cutoff
 
 
-def setup_simulation() -> Tuple[MDSimulation, float, NDArray[np.float64], float]:
+def setup_simulation() -> tuple[MDSimulation, float, NDArray[np.float64], float]:
     num_A: int = 500
     num_B: int = 500
     num_C: int = 500
@@ -45,27 +46,56 @@ def setup_simulation() -> Tuple[MDSimulation, float, NDArray[np.float64], float]
     species_B: Species = Species(name="B", mass=2.0, radius=0.02, color="blue")
     species_C: Species = Species(name="C", mass=3.0, radius=0.03, color="purple")
 
-    pos_A: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_A, 2)))  # Random positions
-    vel_A: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_A, 2)) - 0.5)  # Random velocities
+    pos_A: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_A, 2))
+    )  # Random positions
+    vel_A: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_A, 2)) - 0.5
+    )  # Random velocities
 
-    pos_B: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_B, 2)))  # Random positions
-    vel_B: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_B, 2)) - 0.5)  # Random velocities
+    pos_B: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_B, 2))
+    )  # Random positions
+    vel_B: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_B, 2)) - 0.5
+    )  # Random velocities
 
-    pos_C: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_C, 2)))  # Random positions
-    vel_C: NDArray[np.float64] = cast(NDArray[np.float64], rng.random((num_C, 2)) - 0.5)  # Random velocities
+    pos_C: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_C, 2))
+    )  # Random positions
+    vel_C: NDArray[np.float64] = cast(
+        NDArray[np.float64], rng.random((num_C, 2)) - 0.5
+    )  # Random velocities
 
     # Create Particle instances with proper type casting
-    particles: List[Particle] = (
-        [Particle(species_A, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_A, vel_A)]
-        + [Particle(species_B, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_B, vel_B)]
-        + [Particle(species_C, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)) for p, v in zip(pos_C, vel_C)]
+    particles: list[Particle] = (
+        [
+            Particle(
+                species_A, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)
+            )
+            for p, v in zip(pos_A, vel_A, strict=False)
+        ]
+        + [
+            Particle(
+                species_B, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)
+            )
+            for p, v in zip(pos_B, vel_B, strict=False)
+        ]
+        + [
+            Particle(
+                species_C, cast(NDArray[np.float64], p), cast(NDArray[np.float64], v)
+            )
+            for p, v in zip(pos_C, vel_C, strict=False)
+        ]
     )
 
     sim: MDSimulation = MDSimulation(particles, reaction_probability)
     dt: float = 1 / 30  # Time step
     T: float = 300.0  # Temperature
 
-    masses: NDArray[np.float64] = np.array([p.mass for p in particles], dtype=np.float64)
+    masses: NDArray[np.float64] = np.array(
+        [p.mass for p in particles], dtype=np.float64
+    )
 
     return (
         sim,

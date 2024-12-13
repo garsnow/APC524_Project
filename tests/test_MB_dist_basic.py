@@ -1,13 +1,13 @@
 import sys
 from pathlib import Path
-from typing import List, Tuple, Optional, cast
+from typing import cast
 
 import numpy as np
-from numpy.random import Generator, default_rng
 import pytest
+from numpy.random import Generator
+from numpy.typing import NDArray
 
 from src.MB_dist import Histogram, MDSimulation, Particle, Species, get_KE, get_speeds
-from numpy.typing import NDArray
 
 # Add 'src/' directory to sys.path
 src_path: Path = Path(__file__).parent.parent / "src"
@@ -59,7 +59,7 @@ def particle_C(species_C: Species) -> Particle:
 
 @pytest.fixture
 def simulation(particle_A: Particle, particle_B: Particle) -> MDSimulation:
-    particles: List[Particle] = [particle_A, particle_B]
+    particles: list[Particle] = [particle_A, particle_B]
     reaction_probability: float = 0.0
     return MDSimulation(particles, reaction_probability)
 
@@ -67,8 +67,16 @@ def simulation(particle_A: Particle, particle_B: Particle) -> MDSimulation:
 @pytest.fixture
 def simulation_reaction(species_A: Species, species_B: Species) -> MDSimulation:
     # Create two particles positioned to collide after dt=0.1
-    p1: Particle = Particle(species_A, np.array([0.45, 0.5], dtype=np.float64), np.array([1.0, 0.0], dtype=np.float64))
-    p2: Particle = Particle(species_B, np.array([0.55, 0.5], dtype=np.float64), np.array([-1.0, 0.0], dtype=np.float64))
+    p1: Particle = Particle(
+        species_A,
+        np.array([0.45, 0.5], dtype=np.float64),
+        np.array([1.0, 0.0], dtype=np.float64),
+    )
+    p2: Particle = Particle(
+        species_B,
+        np.array([0.55, 0.5], dtype=np.float64),
+        np.array([-1.0, 0.0], dtype=np.float64),
+    )
     reaction_probability: float = 1.0  # always react
     return MDSimulation([p1, p2], reaction_probability)
 
@@ -76,8 +84,16 @@ def simulation_reaction(species_A: Species, species_B: Species) -> MDSimulation:
 @pytest.fixture
 def simulation_elastic(species_A: Species) -> MDSimulation:
     # Create two particles of the same species to test elastic collision
-    p1: Particle = Particle(species_A, np.array([0.45, 0.5], dtype=np.float64), np.array([1.0, 0.0], dtype=np.float64))
-    p2: Particle = Particle(species_A, np.array([0.55, 0.5], dtype=np.float64), np.array([-1.0, 0.0], dtype=np.float64))
+    p1: Particle = Particle(
+        species_A,
+        np.array([0.45, 0.5], dtype=np.float64),
+        np.array([1.0, 0.0], dtype=np.float64),
+    )
+    p2: Particle = Particle(
+        species_A,
+        np.array([0.55, 0.5], dtype=np.float64),
+        np.array([-1.0, 0.0], dtype=np.float64),
+    )
     reaction_probability: float = 0.0  # no reaction
     return MDSimulation([p1, p2], reaction_probability)
 
@@ -157,14 +173,16 @@ def simulation_elastic(species_A: Species) -> MDSimulation:
         ),
     ],
 )
-def test_get_speeds(particles: List[Particle], expected_speeds: NDArray[np.float64]) -> None:
+def test_get_speeds(
+    particles: list[Particle], expected_speeds: NDArray[np.float64]
+) -> None:
     computed_speeds: NDArray[np.float64] = get_speeds(particles).astype(np.float64)
     np.testing.assert_array_almost_equal(computed_speeds, expected_speeds)
 
 
 # Test with an empty list of particles
 def test_get_speeds_empty() -> None:
-    particles: List[Particle] = []
+    particles: list[Particle] = []
     expected_speeds: NDArray[np.float64] = np.array([], dtype=np.float64)
 
     computed_speeds: NDArray[np.float64] = get_speeds(particles).astype(np.float64)
@@ -176,8 +194,16 @@ def test_get_KE() -> None:
     species_A: Species = Species(name="A", mass=1.0, radius=0.01, color="red")
     species_B: Species = Species(name="B", mass=2.0, radius=0.02, color="blue")
 
-    particle_A: Particle = Particle(species_A, np.array([0.1, 0.1], dtype=np.float64), np.array([3.0, 4.0], dtype=np.float64))
-    particle_B: Particle = Particle(species_B, np.array([0.9, 0.9], dtype=np.float64), np.array([0.0, 0.0], dtype=np.float64))
+    particle_A: Particle = Particle(
+        species_A,
+        np.array([0.1, 0.1], dtype=np.float64),
+        np.array([3.0, 4.0], dtype=np.float64),
+    )
+    particle_B: Particle = Particle(
+        species_B,
+        np.array([0.9, 0.9], dtype=np.float64),
+        np.array([0.0, 0.0], dtype=np.float64),
+    )
 
     speeds: NDArray[np.float64] = get_speeds([particle_A, particle_B])
     m: float = 2.0  # Average mass or specific mass as per your simulation logic
@@ -218,7 +244,7 @@ def test_MDSimulation_advance_with_collision(simulation_elastic: MDSimulation) -
     expected_pos_p2: NDArray[np.float64] = pos_before_p2 + vel_before_p2 * dt
 
     expected_vel_p1: NDArray[np.float64] = vel_before_p2  # [-1.0, 0.0]
-    expected_vel_p2: NDArray[np.float64] = vel_before      # [1.0, 0.0]
+    expected_vel_p2: NDArray[np.float64] = vel_before  # [1.0, 0.0]
 
     np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
     np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
@@ -230,9 +256,19 @@ def test_MDSimulation_advance_with_collision(simulation_elastic: MDSimulation) -
 
 
 # Testing MDSimulation.advance without collision
-def test_MDSimulation_advance_without_collision(species_A: Species, species_B: Species) -> None:
-    p1: Particle = Particle(species_A, np.array([0.2, 0.2], dtype=np.float64), np.array([1.0, 0.0], dtype=np.float64))
-    p2: Particle = Particle(species_B, np.array([0.8, 0.8], dtype=np.float64), np.array([0.0, 1.0], dtype=np.float64))
+def test_MDSimulation_advance_without_collision(
+    species_A: Species, species_B: Species
+) -> None:
+    p1: Particle = Particle(
+        species_A,
+        np.array([0.2, 0.2], dtype=np.float64),
+        np.array([1.0, 0.0], dtype=np.float64),
+    )
+    p2: Particle = Particle(
+        species_B,
+        np.array([0.8, 0.8], dtype=np.float64),
+        np.array([0.0, 1.0], dtype=np.float64),
+    )
 
     reaction_probability: float = 0.0
     sim: MDSimulation = MDSimulation([p1, p2], reaction_probability)
@@ -253,20 +289,38 @@ def test_MDSimulation_advance_without_collision(species_A: Species, species_B: S
 
 
 # Testing MDSimulation boundary reflection
-def test_MDSimulation_boundary_reflection(species_A: Species, species_B: Species) -> None:
+def test_MDSimulation_boundary_reflection(
+    species_A: Species, species_B: Species
+) -> None:
     # Create particles positioned to collide with walls
-    p1: Particle = Particle(species_A, np.array([0.05, 0.5], dtype=np.float64), np.array([-1.0, 0.0], dtype=np.float64))  # Left wall
-    p2: Particle = Particle(species_B, np.array([0.95, 0.5], dtype=np.float64), np.array([1.0, 0.0], dtype=np.float64))   # Right wall
+    p1: Particle = Particle(
+        species_A,
+        np.array([0.05, 0.5], dtype=np.float64),
+        np.array([-1.0, 0.0], dtype=np.float64),
+    )  # Left wall
+    p2: Particle = Particle(
+        species_B,
+        np.array([0.95, 0.5], dtype=np.float64),
+        np.array([1.0, 0.0], dtype=np.float64),
+    )  # Right wall
 
     reaction_probability: float = 0.0
     sim: MDSimulation = MDSimulation([p1, p2], reaction_probability)
     dt: float = 0.1
     sim.advance(dt)
 
-    expected_pos_p1: NDArray[np.float64] = np.array([p1.radius, 0.5], dtype=np.float64)  # Should be set back to radius
-    expected_pos_p2: NDArray[np.float64] = np.array([1 - p2.radius, 0.5], dtype=np.float64)  # Should be set back to 1 - radius
-    expected_vel_p1: NDArray[np.float64] = np.array([1.0, 0.0], dtype=np.float64)  # Reversed
-    expected_vel_p2: NDArray[np.float64] = np.array([-1.0, 0.0], dtype=np.float64)  # Reversed
+    expected_pos_p1: NDArray[np.float64] = np.array(
+        [p1.radius, 0.5], dtype=np.float64
+    )  # Should be set back to radius
+    expected_pos_p2: NDArray[np.float64] = np.array(
+        [1 - p2.radius, 0.5], dtype=np.float64
+    )  # Should be set back to 1 - radius
+    expected_vel_p1: NDArray[np.float64] = np.array(
+        [1.0, 0.0], dtype=np.float64
+    )  # Reversed
+    expected_vel_p2: NDArray[np.float64] = np.array(
+        [-1.0, 0.0], dtype=np.float64
+    )  # Reversed
 
     np.testing.assert_array_almost_equal(p1.pos, expected_pos_p1)
     np.testing.assert_array_almost_equal(p2.pos, expected_pos_p2)
@@ -308,12 +362,16 @@ def test_Histogram_update() -> None:
     data_new: NDArray[np.float64] = np.array([2, 3, 4, 4, 4, 4], dtype=np.float64)
     hist_obj.update(data_new)
 
-    expected_hist, expected_bins = np.histogram(data_new, bins=np.linspace(0, 4, 3), density=False)
+    expected_hist, expected_bins = np.histogram(
+        data_new, bins=np.linspace(0, 4, 3), density=False
+    )
     expected_hist = expected_hist.astype(np.float64)
     expected_bins = expected_bins.astype(np.float64)
-    
+
     assert np.array_equal(hist_obj.hist, expected_hist)
-    expected_top: NDArray[np.float64] = np.zeros(len(expected_hist), dtype=np.float64) + expected_hist
+    expected_top: NDArray[np.float64] = (
+        np.zeros(len(expected_hist), dtype=np.float64) + expected_hist
+    )
     np.testing.assert_array_almost_equal(hist_obj.top, expected_top)
 
 
@@ -339,16 +397,15 @@ def test_MDSimulation_reaction(simulation_reaction: MDSimulation) -> None:
     new_p: Particle = simulation_reaction.particles[-1]
     assert new_p.species.name == "C", "New particle should be of species 'C'."
     expected_pos: NDArray[np.float64] = cast(
-        NDArray[np.float64], 
-        (0.5 * (p1.pos + p2.pos))
+        NDArray[np.float64], (0.5 * (p1.pos + p2.pos))
     )
     expected_vel: NDArray[np.float64] = cast(
-        NDArray[np.float64],
-        (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
+        NDArray[np.float64], (p1.mass * p1.vel + p2.mass * p2.vel) / (p1.mass + p2.mass)
     )
     np.testing.assert_array_almost_equal(new_p.pos, expected_pos)
     np.testing.assert_array_almost_equal(new_p.vel, expected_vel)
 
     number_steps: int = 1
-    assert simulation_reaction.nsteps == number_steps, "Number of simulation steps is incorrect."
-
+    assert (
+        simulation_reaction.nsteps == number_steps
+    ), "Number of simulation steps is incorrect."

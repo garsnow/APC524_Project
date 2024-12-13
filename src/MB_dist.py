@@ -1,21 +1,20 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import cast, Tuple, Optional, List, Union
+from typing import cast
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.axes import Axes
-from matplotlib.text import Text
+import numpy as np
 from matplotlib import patches, path
-from matplotlib.animation import FuncAnimation
+from matplotlib.axes import Axes
 from matplotlib.collections import PathCollection
+from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
-import numpy as np
-from numpy.typing import NDArray
+from matplotlib.text import Text
 from numpy.random import Generator, default_rng
+from numpy.typing import NDArray
 from scipy.spatial.distance import pdist, squareform
 
 # Set Matplotlib backend based on environment variable or default to 'TkAgg'
@@ -72,7 +71,7 @@ class Particle:
 class MDSimulation:
     """Molecular Dynamics simulation of particle movements and interactions in a container"""
 
-    fig: Optional[Figure] = None  # Defined here
+    fig: Figure | None = None  # Defined here
 
     def __init__(
         self,
@@ -92,7 +91,7 @@ class MDSimulation:
         self.particles: list[Particle] = particles
         self.n: int = len(particles)
         self.nsteps: int = 0
-        self.reactions: list[Tuple[Particle, Particle, Particle]] = []
+        self.reactions: list[tuple[Particle, Particle, Particle]] = []
         self.reaction_probability: float = reaction_probability
         self.rng: Generator = rng if rng is not None else default_rng()
 
@@ -110,20 +109,26 @@ class MDSimulation:
             p.pos += p.vel * dt
 
         # Compute distances between all pairs
-        pos_array: NDArray[np.float64] = np.array([p.pos for p in self.particles], dtype=np.float64)
-        dist_matrix: NDArray[np.float64] = squareform(pdist(pos_array)).astype(np.float64)
+        pos_array: NDArray[np.float64] = np.array(
+            [p.pos for p in self.particles], dtype=np.float64
+        )
+        dist_matrix: NDArray[np.float64] = squareform(pdist(pos_array)).astype(
+            np.float64
+        )
 
         # Prevent self collisions by setting diagonal to infinity
         np.fill_diagonal(dist_matrix, np.inf)
 
         # Sum of radii for each pair
-        radii: NDArray[np.float64] = np.array([p.radius for p in self.particles], dtype=np.float64)
+        radii: NDArray[np.float64] = np.array(
+            [p.radius for p in self.particles], dtype=np.float64
+        )
         sum_r: NDArray[np.float64] = np.add.outer(radii, radii).astype(np.float64)
 
         # Identify collisions (dist <= sum of radii and not zero)
-        collisions: Tuple[NDArray[np.intp], NDArray[np.intp]] = cast(
-            Tuple[NDArray[np.intp], NDArray[np.intp]],
-            np.where((dist_matrix <= sum_r) & (dist_matrix > 0))
+        collisions: tuple[NDArray[np.intp], NDArray[np.intp]] = cast(
+            tuple[NDArray[np.intp], NDArray[np.intp]],
+            np.where((dist_matrix <= sum_r) & (dist_matrix > 0)),
         )
 
         iarr: NDArray[np.intp] = collisions[0].astype(np.intp)
@@ -134,7 +139,7 @@ class MDSimulation:
         iarr, jarr = iarr[k], jarr[k]
 
         # Resolve particle collisions
-        for i, j in zip(iarr, jarr):
+        for i, j in zip(iarr, jarr, strict=False):
             self.resolve_collision(self.particles[i], self.particles[j])
 
         # Delete A,B and add C to particles list
@@ -185,7 +190,9 @@ class MDSimulation:
             m1: float = p1.mass
             m2: float = p2.mass
             total_mass: float = m1 + m2
-            new_vel: NDArray[np.float64] = ((m1 * p1.vel + m2 * p2.vel) / total_mass).astype(np.float64)
+            new_vel: NDArray[np.float64] = (
+                (m1 * p1.vel + m2 * p2.vel) / total_mass
+            ).astype(np.float64)
 
             species_C: Species = Species(
                 name="C", mass=3.0, radius=0.03, color="purple"
@@ -328,18 +335,14 @@ def particle_simulator_initial_steps(
     error_message: str = "Matrix_A,B,C must be a list, tuple, or NumPy array with three elements: [num_A, mass_A, radius_A]"
 
     # Validate Matrix_A
-    if not (
-        len(Matrix_A) == MATRIX_SIZE
-    ):
+    if not (len(Matrix_A) == MATRIX_SIZE):
         raise ValueError(error_message)
 
     # Similarly validate Matrix_B and Matrix_C
     for Matrix, _name in zip(
-        [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"]
+        [Matrix_B, Matrix_C], ["Matrix_B", "Matrix_C"], strict=False
     ):
-        if not (
-            len(Matrix) == MATRIX_SIZE
-        ):
+        if not (len(Matrix) == MATRIX_SIZE):
             raise ValueError(error_message)
 
     # Extract properties for species A, B, C from Matrices
@@ -356,39 +359,39 @@ def particle_simulator_initial_steps(
 
     # Create initial positions and velocities for each species
     # For simplicity, place species A on the left side, species B on the right, species C in the middle
-    pos_A: List[NDArray[np.float64]] = list(
+    pos_A: list[NDArray[np.float64]] = list(
         rng.random((int(num_A), 2), dtype=np.float64) * 0.4 + 0.05
     )  # left side
-    vel_A: List[NDArray[np.float64]] = list(
+    vel_A: list[NDArray[np.float64]] = list(
         rng.random((int(num_A), 2), dtype=np.float64) - 0.5
     )
 
-    pos_B: List[NDArray[np.float64]] = list(
+    pos_B: list[NDArray[np.float64]] = list(
         rng.random((int(num_B), 2), dtype=np.float64) * 0.4 + 0.55
     )  # right side
-    vel_B: List[NDArray[np.float64]] = list(
+    vel_B: list[NDArray[np.float64]] = list(
         rng.random((int(num_B), 2), dtype=np.float64) - 0.5
     )
 
-    pos_C: List[NDArray[np.float64]] = list(
+    pos_C: list[NDArray[np.float64]] = list(
         rng.random((int(num_C), 2), dtype=np.float64) * 0.4 + 0.3
     )  # middle
-    vel_C: List[NDArray[np.float64]] = list(
+    vel_C: list[NDArray[np.float64]] = list(
         rng.random((int(num_C), 2), dtype=np.float64) - 0.5
     )
-    
+
     # Create Particle instances
-    for p, v in zip(pos_A, vel_A):
+    for p, v in zip(pos_A, vel_A, strict=False):
         pos_pA: NDArray[np.float64] = cast(NDArray[np.float64], p)
         vel_vA: NDArray[np.float64] = cast(NDArray[np.float64], v)
         particles.append(Particle(species_A, pos_pA, vel_vA))
 
-    for p, v in zip(pos_B, vel_B):
+    for p, v in zip(pos_B, vel_B, strict=False):
         pos_pB: NDArray[np.float64] = cast(NDArray[np.float64], p)
         vel_vB: NDArray[np.float64] = cast(NDArray[np.float64], v)
         particles.append(Particle(species_B, pos_pB, vel_vB))
-    
-    for p, v in zip(pos_C, vel_C):
+
+    for p, v in zip(pos_C, vel_C, strict=False):
         pos_pC: NDArray[np.float64] = cast(NDArray[np.float64], p)
         vel_vC: NDArray[np.float64] = cast(NDArray[np.float64], v)
         particles.append(Particle(species_C, pos_pC, vel_vC))
@@ -397,7 +400,7 @@ def particle_simulator_initial_steps(
 
 def setup_plot(
     sim: MDSimulation,
-) -> Tuple[
+) -> tuple[
     Figure,
     Axes,
     PathCollection,
@@ -461,7 +464,9 @@ def setup_plot(
     speed_ax.set_ylim(0, fmax)
 
     # For the distribution derived by averaging, take the abscissa speed points from the centre of the histogram bars.
-    sgrid: NDArray[np.float64] = ((speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2).astype(np.float64)
+    sgrid: NDArray[np.float64] = (
+        (speed_hist.bins[1:] + speed_hist.bins[:-1]) / 2
+    ).astype(np.float64)
     mb_est_line: Line2D = speed_ax.plot([], [], c="r")[0]
     mb_est: NDArray[np.float64] = np.zeros(len(sgrid), dtype=np.float64)
     xlabel: float = sgrid[-1] / 2
@@ -482,4 +487,3 @@ def setup_plot(
         label,
         sgrid,
     )
-
