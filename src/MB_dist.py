@@ -404,7 +404,7 @@ def setup_plot(
 ) -> tuple[
     Figure,
     Axes,
-    PathCollection,
+    Collection,
     Axes,
     Histogram,
     Line2D,
@@ -533,12 +533,12 @@ def particle_simulator(
     count_B: list[int] = []
     count_C: list[int] = []
 
-    def init_anim() -> tuple[PathCollection, Text]:
+    def init_anim() -> tuple[Collection, Text]:
         """Initialize the animation"""
         scatter.set_offsets(np.zeros((0, 2)))
         return scatter, label
 
-    def animate(i: int) -> tuple[PathCollection, PathPatch, Line2D, Text]:
+    def animate(i: int) -> tuple[Collection, PathPatch, Line2D, Text]:
         """Advance the animation by one step and update the frame."""
 
         nonlocal mb_est
