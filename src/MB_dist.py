@@ -1,13 +1,13 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import Iterable, Protocol, Any, cast, Tuple
+from typing import Iterable, Any, cast, Tuple
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
 from matplotlib.axes import Axes
-from matplotlib.collections import PathCollection, Collection
+from matplotlib.collections import Collection
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
@@ -397,38 +397,12 @@ def particle_simulator_initial_steps(
         particles.append(Particle(species_C, pos_pC, vel_vC))
     return particles
 
-from typing import Protocol, Any
-from matplotlib.artist import Artist
-
-class ArtistProtocol(Protocol):
-    def draw(self, renderer: Any) -> None:
-        ...
-    
-    def get_visible(self) -> bool:
-        ...
-    
-    def set_visible(self, visible: bool) -> None:
-        ...
-    
-    def get_alpha(self) -> float:
-        ...
-    
-    def set_alpha(self, alpha: float) -> None:
-        ...
-
-class SupportsSetFacecolorsAndOffsets(Protocol, ArtistProtocol):
-    def set_facecolors(self, colors: Any, *args: Any, **kwargs: Any) -> None:
-        ...
-    
-    def set_offsets(self, offsets: Any, *args: Any, **kwargs: Any) -> None:
-        ...
-
 def setup_plot(
     sim: MDSimulation,
 ) -> tuple[
     Figure,
     Axes,
-    SupportsSetFacecolorsAndOffsets,
+    Collection,
     Axes,
     Histogram,
     Line2D,
@@ -466,7 +440,7 @@ def setup_plot(
     y: list[float] = [p.pos[Y] for p in sim.particles]
 
     colors: list[Color] = [p.color for p in sim.particles]
-    scatter: SupportsSetFacecolorsAndOffsets = cast(SupportsSetFacecolorsAndOffsets, ax.scatter(x, y, c=colors, s=30))
+    scatter: Collection = ax.scatter(x, y, c=colors, s=30)
 
     # The 2D Maxwell-Boltzmann distribution of speeds & Histogram setup.
     masses: list[float] = [p.mass for p in sim.particles]
