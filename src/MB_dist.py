@@ -1,6 +1,7 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
 from typing import Iterable, Any, cast, Tuple
+from matplotlib.artist import Artist
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
