@@ -1,18 +1,19 @@
 # Code from https://scipython.com/blog/the-maxwellboltzmann-distribution-in-two-dimensions/#:~:text=The%20Maxwell%E2%80%93Boltzmann%20distribution%20in%20two%20dimensions.%20Posted
 import os
-from typing import Iterable, Any, cast, Tuple
-from matplotlib.artist import Artist
+from collections.abc import Iterable
+from typing import cast
 
 import matplotlib as mpl  # Aliased as per formatter's recommendation
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches, path
+from matplotlib.animation import FuncAnimation
+from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 from matplotlib.collections import Collection
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import PathPatch
-from matplotlib.animation import FuncAnimation
 from matplotlib.text import Text
 from numpy.random import Generator, default_rng
 from numpy.typing import NDArray
@@ -398,6 +399,7 @@ def particle_simulator_initial_steps(
         particles.append(Particle(species_C, pos_pC, vel_vC))
     return particles
 
+
 def setup_plot(
     sim: MDSimulation,
 ) -> tuple[
@@ -487,6 +489,7 @@ def setup_plot(
         label,
         sgrid,
     )
+
 
 def particle_simulator(
     Matrix_A: list[float] | tuple[float, float, float] | NDArray[np.float64],
